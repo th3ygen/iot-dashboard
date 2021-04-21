@@ -1,0 +1,4 @@
+openssl req -x509 -days 368000 -out syafiq.crt -keyout syafiq.key \
+  -newkey rsa:2048 -nodes -sha256 \
+  -subj '/CN=syafiq' -extensions EXT -config <( \
+   printf "[dn]\nCN=syafiq\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:syafiq\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
