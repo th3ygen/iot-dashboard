@@ -23,4 +23,6 @@ const schema = new Schema({
     avatar: String
 }, { timestamps: true });
 
-mongoose.model('User', schema);
+const User = mongoose.model('User', schema);
+
+module.exports = User;

@@ -1,3 +1,4 @@
-require('./User.model');
-require('./Channel.model');
-require('./Data.model');
+require('./user.model');
+require('./channel.model');
+require('./data.model');
+require('./key.model');

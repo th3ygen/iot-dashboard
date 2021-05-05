@@ -27,11 +27,12 @@ const login = (username, password) => (
             }
 
             const token = jwt.sign({
-                username, role: user.role
+                username, id: user._id
             }, process.env.JWT_SECRET);
 
             resolve(token);
         } catch (e) {
+            console.log(Object.keys(e));
             reject({
                 label: `auth from {u:${username}, p:${password}}`,
                 msg: e
