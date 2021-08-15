@@ -1,0 +1,44 @@
+@import "../../../themes/ump-dark.module.scss";
+
+.input {
+	background: $COLOR_2 !important;
+	padding: 0 15px;
+
+	height: fit-content !important;
+
+	& > * {
+		font-size: 0.8rem !important;
+		color: $COLOR_3 !important;
+	}
+}
+
+.paper {
+	background: $COLOR_2 !important;
+}
+
+.button {
+	color: $COLOR_3 !important;
+}
+
+.table {
+	background: $COLOR_2 !important;
+	height: 300px;
+
+	& > div {
+		color: $COLOR_3 !important;
+		border: none !important;
+
+		& > div > div {
+			&:nth-child(2) {
+				border-bottom: 1px solid $COLOR_4 !important;
+			}
+
+			& > div {
+				color: $COLOR_3 !important;
+                & > div > div > div > div {
+                    border-bottom: 1px solid $COLOR_4 !important;
+                }
+			}
+		}
+	}
+}

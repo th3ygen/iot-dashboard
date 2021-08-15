@@ -3,7 +3,8 @@ const uniqid = require('uniqid')
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-    title: {
+    title: String,
+    channelId: {
         type: String,
         required: true
     },
@@ -25,18 +26,24 @@ const schema = new Schema({
             variance: Number
         }
     }],  
-
     
     ownerId: mongoose.Types.ObjectId,
     uniqueId: String
 }, { timestamps: true });
 
-schema.statics.add = async (ownerId, title) => {
+schema.statics.isIdUnique = async id => {
+    const channel = await Channel.findOne({ channelId: id });
+
+    return !channel;
+}
+
+schema.statics.add = async (title, ownerId, channelId) => {
     try {
         const uniqueId = uniqid();
 
         const channel = new Channel({
             title,
+            channelId,
             description: '',
             image: '',
             fields: [],
@@ -52,7 +59,7 @@ schema.statics.add = async (ownerId, title) => {
     }
 };
 
-schema.methods.addField = async label => {
+schema.methods.addField = async function(label) {
     const labelExists = this.fields.find(q => (q.label === label));
 
     if (labelExists) {
@@ -75,6 +82,8 @@ schema.methods.addField = async label => {
             variance: 0
         }
     });
+
+    this.save();
 };
 
 schema.methods.removeField = async label => {

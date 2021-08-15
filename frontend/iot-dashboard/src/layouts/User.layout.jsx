@@ -1,17 +1,162 @@
-import React from 'react';
+import React from "react";
+import { Link, withRouter, Redirect } from "react-router-dom";
 
-const Layout = ({ children }) => {
-    return (
-        <React.Fragment>
-            <header>
-                This is header
-            </header>
+import Avatar from "@material-ui/core/Avatar";
+import Badge from "@material-ui/core/Badge";
 
-            <main>
-                {children}
-            </main>
-        </React.Fragment>
-    )
-};
+import {
+	Dashboard as DashboardIcon,
+	Equalizer as AnalyticIcon,
+	AccountBox as AccountIcon,
+	Label as ChannelsIcon,
+	FilterList as FilterIcon,
+	Storage as BrowseIcon,
+	Mail as NotiIcon,
+	VpnKey as KeyIcon,
+} from "@material-ui/icons";
 
-export default Layout;
+import style from "./styles/User.module.scss";
+
+function Layout({ children, history }) {
+
+	const isAuthenticated = !localStorage.getItem("isAuthenticated");
+
+	const pageName =
+		window.location.pathname.split("/")[
+			window.location.pathname.split("/").length - 1
+		];
+
+
+	if (isAuthenticated) {
+		return (
+			<React.Fragment>
+				<div className={style.header}>
+					<div className={style.topbar}>
+						<div className={style.logo}></div>
+						<div className={style.tools}>
+							<div className={style.noti}>
+								<Badge badgeContent={3} color="error">
+									<NotiIcon />
+								</Badge>
+							</div>
+							<div className={style.avatar}>
+								<Avatar
+									alt="Muhd. Aidil Syazwan"
+									src="/static/images/test.png"
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+	
+				<div className={style.sidebar}>
+					<div className={style.user}>
+						<div className={style.field}>
+							<div className={style.avatar}>
+								<Avatar
+									alt="Muhd. Aidil Syazwan"
+									src="/static/images/test.png"
+								/>
+							</div>
+							<div className={style.label}>
+								<span className={style.name}>
+									Muhd. Aidil Syazwan
+								</span>
+								<div className={style.occupation}>
+									<span>Occupation: </span>
+									<span>Student</span>
+								</div>
+							</div>
+						</div>
+					</div>
+	
+					<nav className={style.nav}>
+						<div className={style.group}>
+							<div className={style.title}>General</div>
+							<div className={style.links}>
+								<Link
+									to={"/user/dashboard"}
+									className={`${style.link} ${
+										pageName === "dashboard" && style.active
+									}`}
+								>
+									<DashboardIcon />
+									<span>Dashboard</span>
+								</Link>
+								<Link
+									to={"/user/analytics"}
+									className={`${style.link} ${
+										pageName === "analytics" && style.active
+									}`}
+								>
+									<AnalyticIcon />
+									<span>Analytics</span>
+								</Link>
+								<Link
+									to={"/user/account"}
+									className={`${style.link} ${
+										pageName === "account" && style.active
+									}`}
+								>
+									<AccountIcon />
+									<span>Account</span>
+								</Link>
+							</div>
+						</div>
+						<div className={style.group}>
+							<div className={style.title}>Data</div>
+							<div className={style.links}>
+								<Link
+									to={"/user/browse"}
+									className={`${style.link} ${
+										pageName === "browse" && style.active
+									}`}
+								>
+									<BrowseIcon />
+									<span>Browse</span>
+								</Link>
+								<Link
+									to={"/user/keys"}
+									className={`${style.link} ${
+										pageName === "keys" && style.active
+									}`}
+								>
+									<KeyIcon />
+									<span>Keys</span>
+								</Link>
+								<Link
+									to={"/user/channels"}
+									className={`${style.link} ${
+										pageName === "channels" && style.active
+									}`}
+								>
+									<ChannelsIcon />
+									<span>Channels</span>
+								</Link>
+								<Link
+									to={"/user/filter"}
+									className={`${style.link} ${
+										pageName === "filters" && style.active
+									}`}
+								>
+									<FilterIcon />
+									<span>Filters</span>
+								</Link>
+							</div>
+						</div>
+					</nav>
+				</div>
+	
+				<main className={style.container}>{children}</main>
+			</React.Fragment>
+		);
+	}
+
+	return (
+		<React.Fragment>
+			<Redirect to="/"/>
+		</React.Fragment>
+	)
+}
+
+export default withRouter(Layout);

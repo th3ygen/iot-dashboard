@@ -1,21 +1,28 @@
 const mongoose = require('mongoose');
+
 const Data = mongoose.model('Data');
 
 module.exports = {
-    push: async (req, res) => {
+    findByChannelId: async (req, res) => {
         try {
-            const { channelId } = req.params;
-            const { label, value } = req.body;
+            const { id } = req.query;
 
-            const data = await Data.push(channelId, label, value);
+            if (!id) {
+                return res.status(402).json({
+                    msg: 'no channel id provided'
+                });
+            }
+
+            const data = await Data.find({ channelId: id });
 
             res.status(200).json({
                 data
             });
         } catch (e) {
-            res.status(500).json({
-                msg: e
-            });
-        }
+			helper.log(e, "ROUTE: /data/get", "red");
+			res.status(500).json({
+				msg: e
+			});
+		}
     }
-};
+}

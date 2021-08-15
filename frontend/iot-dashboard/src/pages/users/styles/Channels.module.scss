@@ -1,0 +1,102 @@
+@import "../../../themes/ump-dark.module.scss";
+
+.channels-container {
+	min-height: 100px;
+
+	& > .empty {
+		height: 100px;
+		width: 100%;
+
+		display: flex;
+
+		justify-content: center;
+		align-items: center;
+
+		color: $COLOR_5;
+	}
+}
+
+.actions {
+	display: flex;
+
+	justify-content: flex-end;
+
+	& > button {
+		color: $COLOR_4 !important;
+		border: 1px solid $COLOR_6 !important;
+	}
+
+	margin-bottom: 10px;
+	padding: 0 10px;
+}
+
+.accordion {
+	background: $COLOR_2 !important;
+	color: gray !important;
+
+	& > div > div:nth-child(2) {
+		color: $COLOR_4 !important;
+	}
+}
+
+.stepper {
+	background: $COLOR_2 !important;
+	color: gray !important;
+
+	border-radius: 5px;
+}
+
+.stepper-label > span {
+	& > span {
+		color: $COLOR_3 !important;
+	}
+	& > svg {
+		color: $COLOR_6 !important;
+		& > text {
+			fill: $COLOR_4 !important;
+		}
+	}
+}
+
+.vert-form {
+	display: flex;
+
+	flex-direction: column;
+	gap: 15px;
+
+	width: 100%;
+
+    padding: 5px 0;
+
+    align-items: flex-end;
+}
+
+.input-text {
+	& label {
+		top: -5px;
+		color: gray !important;
+
+		font-size: 0.9rem !important;
+	}
+
+	& > *::before {
+        border-bottom: 1px solid $COLOR_5 !important;
+	}
+
+    & input {
+        color: $COLOR_3;
+    }
+}
+
+.step-action {
+	display: flex;
+	gap: 10px;
+}
+
+.step-button {
+    background: $COLOR_4 !important; 
+}
+
+.step-button-b {
+	background: gray !important;
+}

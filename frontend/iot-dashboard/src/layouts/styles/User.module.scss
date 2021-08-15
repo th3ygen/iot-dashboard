@@ -1,0 +1,206 @@
+@import "../../themes/ump-dark.module.scss";
+
+$HEADER_HEIGHT: 60px;
+$SIDEBAR_WIDTH: 250px;
+$SIDEUSER_HEIGHT: 90px;
+$NAV_HEIGHT: calc(100vh - #{$HEADER_HEIGHT} - #{$SIDEUSER_HEIGHT} - 100px);
+
+.header {
+	position: fixed;
+	top: 0;
+	left: 0;
+
+	height: $HEADER_HEIGHT;
+	width: 100%;
+
+	background: $COLOR_2;
+
+	border-bottom: 1px solid $COLOR_6;
+
+	z-index: 99;
+
+	& > .topbar {
+		height: 100%;
+		width: 100%;
+
+		display: flex;
+
+		align-items: center;
+		justify-content: space-between;
+
+		padding: 0 15px;
+
+		& > .tools {
+			display: flex;
+			align-items: center;
+
+			gap: 20px;
+            
+            & > * {
+                cursor: pointer;
+            }
+
+			& > .noti {
+				& > * > svg {
+                    font-size: 1.4rem;
+					color: $COLOR_3;
+				}
+			}
+
+			& > .avatar {
+				& > * {
+					transform: scale(0.7);
+				}
+			}
+		}
+	}
+}
+
+.sidebar {
+	position: fixed;
+	top: $HEADER_HEIGHT;
+	left: 0;
+
+	height: calc(100vh - #{$HEADER_HEIGHT});
+	width: $SIDEBAR_WIDTH;
+
+	background: $COLOR_2;
+
+	border-right: 1px solid $COLOR_6;
+
+	z-index: 98;
+
+	& > .user {
+		height: $SIDEUSER_HEIGHT;
+		width: 100%;
+
+		border-bottom: 1px solid $COLOR_6;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		& > .field {
+			height: 70%;
+			width: 85%;
+
+			background: $COLOR_1;
+
+			border-radius: 15px;
+
+			display: flex;
+
+			& > .avatar {
+				height: 100%;
+
+				display: flex;
+				align-items: center;
+
+				padding: 0 10px;
+
+				& > * {
+					transform: scale(0.9);
+				}
+			}
+
+			& > .label {
+				height: 100%;
+
+				display: flex;
+				flex-direction: column;
+
+				gap: 2px;
+
+				justify-content: center;
+
+				font-size: 0.9rem;
+
+				& > .name {
+					color: white;
+				}
+
+				& > .occupation {
+					font-size: 0.7rem;
+					& > span {
+						&:nth-child(1) {
+							color: gray;
+							padding-right: 3px;
+						}
+						&:nth-child(2) {
+							color: $COLOR_5;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	& > .nav {
+		max-height: $NAV_HEIGHT;
+
+		overflow-y: auto;
+
+		padding: 15px 20px;
+
+		& > .group {
+			& > .title {
+				color: $COLOR_3;
+				font-size: 0.75rem;
+				font-weight: 700;
+
+				letter-spacing: 1px;
+				text-transform: uppercase;
+			}
+
+			& > .links {
+				padding: 10px 0;
+				padding-left: 20px;
+
+				& > .link {
+					padding: 10px 0;
+
+					color: gray;
+
+					display: flex;
+					gap: 10px;
+
+					align-items: center;
+					text-decoration: none;
+
+					& > svg {
+						font-size: 1.2rem;
+					}
+
+					& > span {
+						font-size: 0.8rem;
+					}
+
+					cursor: pointer;
+
+					transition: 0.3s all;
+					&:hover {
+						color: white;
+					}
+
+					&.active {
+						color: $COLOR_4;
+					}
+				}
+			}
+		}
+	}
+}
+
+.container {
+	margin-left: $SIDEBAR_WIDTH;
+	margin-top: $HEADER_HEIGHT;
+
+	min-height: calc(100vh - #{$HEADER_HEIGHT});
+	width: calc(100% - #{$SIDEBAR_WIDTH});
+
+	background: $COLOR_1;
+
+	color: white;
+
+	padding: 40px 30px;
+}

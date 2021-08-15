@@ -1,0 +1,9 @@
+@import '../themes/ump-dark.module.scss';
+
+.grid-stack-custom {
+    border: 1px dashed $COLOR_6;
+
+    & > div > div:first-child {
+        overflow: visible !important;
+    }
+}
