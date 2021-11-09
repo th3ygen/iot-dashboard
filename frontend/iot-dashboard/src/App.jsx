@@ -8,9 +8,13 @@ import {
 import styles from './App.module.scss'; */
 
 import UserLayout from './layouts/User.layout';
-import UserDashboard from './pages/users/Dashboard.page';
-import UserChannels from './pages/users/Channels.page';
-import UserBrowse from './pages/users/Browse.page';
+import UserDashboard from './view/users/Dashboard.page';
+import UserChannels from './view/users/Channels.page';
+import UserBrowse from './view/users/Browse.page';
+import UserKeys from './view/users/Keys.page';
+import UserFilters from './view/users/Filters.page';
+import UserWebhook from './view/users/Webhook.page';
+import UserDevices from './view/users/Devices.page';
 
 function App() {
   return (
@@ -27,6 +31,18 @@ function App() {
               </Route>
               <Route path="/user/browse">
                 <UserBrowse />
+              </Route>
+              <Route path="/user/filters">
+                <UserFilters />
+              </Route>
+              <Route path="/user/keys">
+                <UserKeys />
+              </Route>
+              <Route path="/user/devices">
+                <UserDevices />
+              </Route>
+              <Route path="/user/webhook">
+                <UserWebhook />
               </Route>
               <Route path="*">
                 404

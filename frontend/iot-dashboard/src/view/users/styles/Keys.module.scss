@@ -1,0 +1,112 @@
+@import "../../../themes/ump-dark.module.scss";
+
+
+.MuiSelect-select {
+    padding: 0 !important;
+}
+
+.keys {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    & .key {
+        background: $COLOR_2 !important;
+
+        width: 100%;
+
+        & > .header {
+            padding: 10px;
+
+            color: $COLOR_3;
+
+            border-bottom: 1px solid $COLOR_1;
+        }
+
+        & > .body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+
+            padding: 20px;
+
+            & > .pass {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                & > .label {
+                    flex: 0 0 fit-content;
+                    color: gray;
+
+                    font-size: .9rem;
+                }
+
+                & > .value {
+                    display: flex;
+
+                    justify-content: space-between;
+                    align-items: center;
+
+                    padding: 0 10px 0 15px;
+                    color: gray;
+
+                    font-size: 12px;
+
+                    border: 1px solid $COLOR_6;
+                    border-radius: 8px;
+
+                    background: $COLOR_1;
+
+                    width: 100%;
+                    
+                    & > .copy * {
+                        color: $COLOR_4;
+                    }
+
+                }
+            }
+
+            & > .bind {
+                display: flex;
+                gap: 30px;
+
+                justify-content: flex-end;
+
+                width: 100%;
+
+                & > .channel, .role {
+                    display: flex;
+                    gap: 10px;
+
+                    align-items: center;
+
+                    & .label {
+                        background: $COLOR_2;
+                        color: gray;
+                        font-size: .9rem;
+                    }
+
+                    & > .value {
+                        & > select {
+                            padding: 5px;
+                            background: $COLOR_6;
+                            color: $COLOR_3;
+                            border: none;
+                            border-radius: 3px;
+
+                            outline: none;
+
+                            & option {
+                                background: $COLOR_2;
+                                border: none;
+                                outline: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

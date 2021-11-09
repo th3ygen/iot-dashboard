@@ -13,6 +13,8 @@ import {
 	Storage as BrowseIcon,
 	Mail as NotiIcon,
 	VpnKey as KeyIcon,
+	Devices as DeviceIcon,
+	Cached as WebhookIcon
 } from "@material-ui/icons";
 
 import style from "./styles/User.module.scss";
@@ -20,6 +22,11 @@ import style from "./styles/User.module.scss";
 function Layout({ children, history }) {
 
 	const isAuthenticated = !localStorage.getItem("isAuthenticated");
+
+	// const token = localStorage.getItem("token");
+	const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVkZWwiLCJpZCI6IjYxMGFiNjc5NGZiZWQxNjkzOGFmZTZjMyIsImlhdCI6MTYzNjI2MTQ0MX0.0RSBcrD1GX4t6Nz2TC5cEPpAXsPQUjfaS1JNVWEjZ9g";
+
+	localStorage.setItem('token', token);
 
 	const pageName =
 		window.location.pathname.split("/")[
@@ -116,15 +123,6 @@ function Layout({ children, history }) {
 									<span>Browse</span>
 								</Link>
 								<Link
-									to={"/user/keys"}
-									className={`${style.link} ${
-										pageName === "keys" && style.active
-									}`}
-								>
-									<KeyIcon />
-									<span>Keys</span>
-								</Link>
-								<Link
 									to={"/user/channels"}
 									className={`${style.link} ${
 										pageName === "channels" && style.active
@@ -134,13 +132,40 @@ function Layout({ children, history }) {
 									<span>Channels</span>
 								</Link>
 								<Link
-									to={"/user/filter"}
+									to={"/user/filters"}
 									className={`${style.link} ${
 										pageName === "filters" && style.active
 									}`}
 								>
 									<FilterIcon />
 									<span>Filters</span>
+								</Link>
+								<Link
+									to={"/user/devices"}
+									className={`${style.link} ${
+										pageName === "devices" && style.active
+									}`}
+								>
+									<DeviceIcon />
+									<span>Devices</span>
+								</Link>
+								<Link
+									to={"/user/keys"}
+									className={`${style.link} ${
+										pageName === "keys" && style.active
+									}`}
+								>
+									<KeyIcon />
+									<span>API Keys</span>
+								</Link>
+								<Link
+									to={"/user/webhook"}
+									className={`${style.link} ${
+										pageName === "webhook" && style.active
+									}`}
+								>
+									<WebhookIcon />
+									<span>Webhook</span>
 								</Link>
 							</div>
 						</div>

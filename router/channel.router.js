@@ -7,14 +7,32 @@ const middleware = {
     jwt: require('../middlewares/auth.middleware')
 }
 
-/* params
+/* GET /validateid 
 (
     id: channel id
-    title: channel title
+)
+*/
+router.get('/owned', middleware.jwt.verifyJWT, controller.channel.getOwned);
+
+/* GET /validateid 
+(
+    id: channel id
+)
+*/
+router.get('/validateid', controller.channel.validateId);
+
+/* POST /create
+(
+    id: channel id,
+    title: channel title,
+    description: channel description,
+    field: field[0] name,
+    fieldDesc: field[0] description
 ) 
 */
 router.post('/create', middleware.jwt.verifyJWT, controller.channel.create);
-/* params 
+
+/* POST /addfield
 (
     id: channel id
     label: field label/name

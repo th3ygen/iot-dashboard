@@ -26,16 +26,5 @@ module.exports = {
         req.payload = payload;
 
         next();
-    },
-    verifyAPIKey: async (req, res, next) => {
-        try {
-            const { channelId } = req.params;
-            const { key } = req.body;
-
-            const apiKey = await Key.findOne({ channelId });
-        } catch (e) {
-            helper.log(e, 'verifyAPIKey', 'red');
-            res.status(500).json(e);
-        }
     }
 };

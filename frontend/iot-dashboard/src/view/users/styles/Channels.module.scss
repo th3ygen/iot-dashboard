@@ -34,8 +34,20 @@
 	background: $COLOR_2 !important;
 	color: gray !important;
 
-	& > div > div:nth-child(2) {
-		color: $COLOR_4 !important;
+	& .channel-title {
+		font-size: .85rem;
+		font-weight: 400;
+		color: white;
+	}
+
+	& .channel-desc {
+		font-size: .8rem;
+		font-weight: 100;
+	}
+	& > div {
+		& > div:nth-child(2) {
+			color: $COLOR_4 !important;
+		}
 	}
 }
 
@@ -90,7 +102,11 @@
 
 .step-action {
 	display: flex;
+
+	justify-content: flex-end;
 	gap: 10px;
+
+	margin-top: 20px;
 }
 
 .step-button {

@@ -11,6 +11,7 @@ router.use('/user', require('./user.router'));
 router.use('/auth', require('./auth.router'));
 router.use('/channel', require('./channel.router'));
 router.use('/data', require('./data.router'));
+router.use('/key', require('./key.router'));
 router.use('/api', require('./api'));
 
 require('./mqtt.router');

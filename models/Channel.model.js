@@ -12,6 +12,7 @@ const schema = new Schema({
     image: String,
     fields: [{
         label: String,
+        description: String,
         summary: {
             count: Number,
             range: {
@@ -37,16 +38,19 @@ schema.statics.isIdUnique = async id => {
     return !channel;
 }
 
-schema.statics.add = async (title, ownerId, channelId) => {
+schema.statics.add = async (title, ownerId, channelId, description, field, fieldDesc) => {
     try {
+        console.log(title);
         const uniqueId = uniqid();
-
         const channel = new Channel({
             title,
             channelId,
-            description: '',
+            description,
             image: '',
-            fields: [],
+            fields: [{
+                label: field,
+                description: fieldDesc
+            }],
             ownerId,
             uniqueId
         });

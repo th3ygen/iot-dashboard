@@ -4,26 +4,41 @@ const helper = require("../helpers/basic.helper");
 const Channel = mongoose.model("Channel");
 
 module.exports = {
+	getOwned: async (req, res) => {
+		try {
+			const channels = await Channel.find({ ownerId: req.token.id });
+
+			return res.status(200).json({
+				channels
+			});
+		} catch (e) {
+			helper.log(e.stack, "ROUTE: /api/channel/getOwned", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
 	create: async (req, res) => {
 		try {
-			const { id, title } = req.query;
-
+			const { id, title, description, field, fieldDesc } = req.body;
+			
 			// validate id
 			const isValid = await Channel.isIdUnique(id);
-
+			
 			if (!isValid) {
 				return res.status(402).json({
 					msg: "id already taken",
 				});
 			}
-
-			const channel = await Channel.add(title, req.token.id, id);
+			
+			console.log(id);
+			const channel = await Channel.add(title, req.token.id, id, description, field, fieldDesc);
 
 			res.status(200).json({
-				channel,
+				channel
 			});
 		} catch (e) {
-			helper.log(e, "ROUTE: /api/channel/create", "red");
+			helper.log(e.stack, "ROUTE: /api/channel/create", "red");
 			res.status(500).json({
 				msg: e,
 			});

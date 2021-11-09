@@ -107,7 +107,7 @@ class Browse extends Component {
 					<div className={exStyles.actions}>
 						<Paper className={styles.input}>
 							<InputBase placeholder={"Search data"}></InputBase>
-							<IconButton>
+							<IconButton className={styles['btn-search']}>
 								<SearchIcon />
 							</IconButton>
 						</Paper>
