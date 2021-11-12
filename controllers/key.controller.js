@@ -6,7 +6,7 @@ module.exports = {
     create: async id => {
         const key = await Key.createKey(id);
 
-        return key.getKey();
+        return key;
     },
     getKeys: async id => {
         const keys = await Key.find({ ownerId: id});

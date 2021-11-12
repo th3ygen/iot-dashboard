@@ -7,6 +7,7 @@ const hat = require('hat');
 
 const schema = new Schema({
     pass: String,
+    ref: String,
     ownerId: mongoose.Types.ObjectId,
     channels: [{
         id: mongoose.Types.ObjectId,
@@ -16,7 +17,12 @@ const schema = new Schema({
 
 schema.statics.createKey = async (ownerId) => {
     try {
+        const owner = await User.findById(ownerId);
+
+        const ref = `${owner.username}_${crypto.randomBytes(4).toString('hex')}`;
+
         const key = new Key({
+            ref,
             ownerId,
             channels: []
         });
@@ -29,7 +35,7 @@ schema.statics.createKey = async (ownerId) => {
 
         await key.save();
 
-        return key;
+        return `${ref}_${pass}`;
     } catch (e) {
         _helper.log(`Unable to create key: ${e.message}`, 'error', 'red');
     }
@@ -37,7 +43,7 @@ schema.statics.createKey = async (ownerId) => {
 
 schema.statics.verify = async (pass) => {
     try {
-        pass = CryptoJS.RAbbbit.decrypt(pass, process.env.API_KEY_SECRET).toString(CryptoJS.enc.Utf8);
+        pass = CryptoJS.Rabbit.decrypt(pass, process.env.API_KEY_SECRET).toString(CryptoJS.enc.Utf8);
 
         const key = await Key.findOne({ pass });
 
