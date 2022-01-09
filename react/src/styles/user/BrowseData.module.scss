@@ -1,0 +1,60 @@
+.content {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.log {
+
+    
+    .headers {
+        display: flex;
+        justify-content: space-between;
+        
+        padding-right: 12px;
+
+        margin-bottom: 10px;
+
+        .header {
+            color: #2179FF;
+            font-weight: 500;
+            font-size: 18px;
+
+            &:nth-child(1) {
+                flex: 1 1 10%;
+            }
+            &:nth-child(2) {
+                flex: 1 1 80%;
+            }
+        }
+    }
+    .list {
+        width: 100%;
+        height: 200px;
+        overflow-y: scroll;
+
+        scroll-behavior: smooth;
+
+        .item {
+            display: flex;
+
+            padding: 10px 0;
+
+            &:nth-child(odd) {
+                background-color: #ffffff09;
+            }
+
+            div {
+                font-size: 14px;
+            }
+
+            div:nth-child(1) {
+                flex: 1 1 10%;
+            }
+            div:nth-child(2) {
+                flex: 1 1 80%;
+            }
+        }
+    }
+}

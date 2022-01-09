@@ -21,7 +21,7 @@ export default function Topbar() {
 				</div>
 				<div className={styles.head}>
 					<div className={styles.title}>
-						FK Inventory Management System
+						IoT Dashboard 
 					</div>
 				</div>
 				<div className={styles["user-action"]}>

@@ -3,6 +3,16 @@
   box-sizing: border-box;
 }
 
+div, span {
+  color: rgb(201, 201, 201);
+}
+
+input {
+  background: #21252e;
+  border: 1px solid #2179FF !important;
+  color: white;
+}
+
 /*  scrollbar width */
 ::-webkit-scrollbar {
   width: 10px;
@@ -10,7 +20,7 @@
 
 /* change scrollbar color to background color */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+  background: #282c34; 
 }
 
 /* change scrollbar color */
@@ -55,7 +65,7 @@ code {
 }
 
 .App {
-  background: rgb(234, 243, 255);
+  background: #2e333f;
   min-height: 100vh;
   height: 100%;
 }

@@ -8,7 +8,7 @@ import AdminLayout from "layouts/Admin.layout";
 // pages
 import TestPage from "page/Test";
 
-// Inventory page
+/* // Inventory page
 import ManageInventoryPage from 'page/common/inventory/ManageInventory';
 import InventoryAddItemPage from 'page/common/inventory/AddItem';
 import InventoryEditItemPage from 'page/common/inventory/UpdateItem';
@@ -28,8 +28,25 @@ import UpdateAccountPage from 'page/admin/account/UpdateAccount';
 import ManageOrderPage from 'page/common/order/ManageOrder';
 import AddOrderPage from 'page/common/order/AddOrder';
 import ApproveOrderPage from 'page/common/order/ApproveOrder';
-import UpdateOrderPage from 'page/common/order/UpdateOrder';
+import UpdateOrderPage from 'page/common/order/UpdateOrder'; */
 
+// User -> Data
+import BrowseDataPage from "page/user/BrowseData";
+// User -> Channels
+import ChannelPage from "page/user/channel/Channel";
+import AddChannelPage from "page/user/channel/AddChannel";
+// User -> Webhooks
+import WebhooksPage from "page/user/webhook/Webhooks";
+import AddWebhookPage from "page/user/webhook/AddWebhook";
+// User -> Devices
+import DevicesPage from "page/user/device/Devices";
+import AddDevicePage from "page/user/device/AddDevice";
+// User -> ApiKeys
+import ApiKeysPage from "page/user/apiKey/ApiKeys";
+import AddApiKeyPage from "page/user/apiKey/AddApiKeys";
+// User -> Filters
+import FiltersPage from "page/user/filter/Filters";
+import AddFilterPage from "page/user/filter/AddFilter";
 
 function Home() {
 	return (
@@ -54,10 +71,29 @@ function App() {
 	return (
 		<div className="App">
 			<Routes>
-				<Route path="/ForgotPassword" element={<ForgotPasswordPage />} />
 				<Route path="/user" element={<UserLayout />}>
 					<Route index element={<Home />} />
-					<Route path="inventory" element={<ManageInventoryPage />} />
+					{/* User -> Data */}
+					<Route path="/user/browse" element={<BrowseDataPage />} />
+					{/* User -> Channels */}
+					<Route path="/user/channels" element={<ChannelPage />} />
+					<Route
+						path="/user/channels/add"
+						element={<AddChannelPage />}
+					/>
+					{/* User -> Webhooks */}
+					<Route path="/user/webhooks/add" element={<AddWebhookPage />} />
+					<Route path="/user/webhooks" element={<WebhooksPage />} />
+					{/* User -> Devices */}
+					<Route path="/user/devices" element={<DevicesPage />} />
+					<Route path="/user/devices/add" element={<AddDevicePage />} />
+					{/* User -> ApiKeys */}
+					<Route path="/user/apiKeys" element={<ApiKeysPage />} />
+					<Route path="/user/apiKeys/add" element={<AddApiKeyPage />} />
+					{/* User -> Filters */}
+					<Route path="/user/filters" element={<FiltersPage />} />
+					<Route path="/user/filters/add" element={<AddFilterPage />} />
+					{/* <Route path="inventory" element={<ManageInventoryPage />} />
 					<Route path="/user/inventory/add" element={<InventoryAddItemPage />} />
 					<Route path="/user/inventory/edit" element={<InventoryEditItemPage />} />
 					<Route path="/user/inventory/sell" element={<InventoryAddSoldPage />} />
@@ -67,18 +103,17 @@ function App() {
 					<Route path="accounts" element={<ManageAccountPage />} />
 					<Route path="approve" element={<ApproveOrderPage />} />
 					<Route path="add" element={<AddOrderPage />} />
-					<Route path="update" element={<UpdateOrderPage />} />
-
-					<Route path="tests" element={<TestPage />} />
+					<Route path="update" element={<UpdateOrderPage />} /> */}
+					{/* <Route path="tests" element={<TestPage />} /> */}
 				</Route>
-				<Route path="/admin" element={<AdminLayout />}>
+				{/* <Route path="/admin" element={<AdminLayout />}>
 					<Route index element={<Home />} />
 					<Route path="accounts" element={<ManageAccountPage />} />
 					<Route path="/admin/accounts/add_account" element={<AddAccountPage />} />
 					<Route path="/admin/accounts/update_account" element={<UpdateAccountPage />} />
 					<Route path="report" element={<DisplayReportPage />} />
 					<Route path="inventory" element={<ManageInventoryPage />} />
-				</Route>
+				</Route> */}
 			</Routes>
 		</div>
 	);
