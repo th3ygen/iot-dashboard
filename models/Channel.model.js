@@ -40,7 +40,6 @@ schema.statics.isIdUnique = async id => {
 
 schema.statics.add = async (title, ownerId, channelId, description, field, fieldDesc) => {
     try {
-        console.log(title);
         const uniqueId = uniqid();
         const channel = new Channel({
             title,

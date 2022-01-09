@@ -8,10 +8,10 @@ const path = require('path');
 const helper = require('./helpers/basic.helper');
 
 const app = express();
-const server = require('https').createServer({
+/* const server = require('https').createServer({
     cert: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.crt`)),
     key: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.key`))
-}, app);
+}, app); */
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
@@ -35,9 +35,9 @@ app.use(express.json());
 
     require('./models');
 
-    app.use(require('./router'));
+    app.use('/api', require('./router'));
 
-    server.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT, () => {
         helper.log(`Server started, listening on port ${process.env.PORT}`, 'server', 'green');
     });
 })();

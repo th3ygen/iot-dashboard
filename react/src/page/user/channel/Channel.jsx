@@ -1,3 +1,5 @@
+import { useOutletContext } from "react-router-dom";
+
 import PageHeader from "components/PageHeader.component";
 import Table from "components/Table.component";
 import NumberWidget from "components/NumberWidget.component";
@@ -5,6 +7,8 @@ import NumberWidget from "components/NumberWidget.component";
 import styles from "styles/user/channel/Channel.module.scss";
 
 function ChannelPage() {
+    const [user, setUser] = useOutletContext();
+
 	return (
 		<div className={styles.container}>
 			<PageHeader
