@@ -10,7 +10,7 @@ import styles from './App.module.scss'; */
 import UserLayout from './layouts/User.layout';
 import UserDashboard from './view/users/Dashboard.page';
 import UserChannels from './view/users/Channels.page';
-import UserBrowse from './view/users/Browse.page';
+import UserBrowse from 'view/user/Browse.page';
 import UserKeys from './view/users/Keys.page';
 import UserFilters from './view/users/Filters.page';
 import UserWebhook from './view/users/Webhook.page';
