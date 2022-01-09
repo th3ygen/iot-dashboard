@@ -15,11 +15,9 @@ const schema = new Schema({
     }]
 }, { timestamps: true });
 
-schema.statics.createKey = async (ownerId) => {
+schema.statics.createKey = async (username, ownerId) => {
     try {
-        const owner = await User.findById(ownerId);
-
-        const ref = `${owner.username}_${crypto.randomBytes(4).toString('hex')}`;
+        const ref = `${username}_${crypto.randomBytes(4).toString('hex')}`;
 
         const key = new Key({
             ref,
@@ -35,23 +33,21 @@ schema.statics.createKey = async (ownerId) => {
 
         await key.save();
 
-        return `${ref}_${pass}`;
+        return `${ref}.${pass}`;
     } catch (e) {
         _helper.log(`Unable to create key: ${e.message}`, 'error', 'red');
     }
 };
 
-schema.statics.verify = async (pass) => {
+schema.statics.verify = async pass => {
     try {
-        pass = CryptoJS.Rabbit.decrypt(pass, process.env.API_KEY_SECRET).toString(CryptoJS.enc.Utf8);
+        const ref = pass.split('.')[0];
+        const key = await Key.findOne({ ref });
 
-        const key = await Key.findOne({ pass });
+        const p1 = pass.split('.')[1];
+        const p2 = CryptoJS.Rabbit.decrypt(key.pass, process.env.API_KEY_SECRET).toString(CryptoJS.enc.Utf8);
 
-        if (key) {
-            return true;
-        }
-
-        return false;
+        return (p1 === p2);
     } catch (e) {
         _helper.log(`Unable to verify key: ${e.message}`, 'error', 'red');
         return false;

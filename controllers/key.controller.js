@@ -2,11 +2,22 @@ const mongoose = require('mongoose');
 
 const Key = mongoose.model('Key');
 
+const verifyKey = async key => {
+    const result = await Key.verify(key);
+
+    return result;
+};
+
 module.exports = {
-    create: async id => {
-        const key = await Key.createKey(id);
+    create: async (username, id) => {
+        const key = await Key.createKey(username, id);
 
         return key;
+    },
+    test: async key => {
+        const result = await verifyKey(key);
+
+        return result;
     },
     getKeys: async id => {
         const keys = await Key.find({ ownerId: id});
