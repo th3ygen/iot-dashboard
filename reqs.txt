@@ -1,0 +1,13 @@
+IoT Dashboard features
+``````````````````````
+
+1. Data channels
+2. Data filters
+3. Filter templates
+4. Data visualizations with amcharts
+5. Dashboard customization
+6. Data alerts/notifications
+7. Webhooks
+8. Data reports
+9. API keys
+10. Data import/export
