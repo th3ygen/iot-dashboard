@@ -1,0 +1,72 @@
+.header {
+    .header2 {
+        margin: 0px;
+    }
+
+    .header5 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        font-weight: normal;
+        font-style: italic;
+    }
+
+    .stats {
+        width: 100%;
+
+        display: flex;
+        justify-content: flex-start;
+        gap: 50px;
+
+        padding: 20px 0;
+    }
+
+    .container {
+        display: flex;
+        gap: 30px;
+
+        flex-wrap: wrap;
+
+        .accountTable {
+            flex: 1 1 60%;
+    
+        }
+    }
+}
+
+.button{
+    width: fit-content;
+    height: 30px;
+    padding: 5px 10px;
+    background-color: white;
+    border: 1px solid #2179FFFF;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 15px;
+    color: #2179FFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s all;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+}
+
+.button:hover{
+    background-color: #2179FFFF;
+    color: white;
+    border: 1px solid #2179FFFF;
+
+}
+
+.butAdd{
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}
+
+.totalAccounts {
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+}

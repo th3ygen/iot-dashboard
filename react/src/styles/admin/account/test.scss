@@ -1,0 +1,133 @@
+.header {
+    .header2 {
+        margin: 0px;
+    }
+
+    .header5 {
+        margin-top: 0px;
+        font-weight: normal;
+        font-style: italic;
+    }
+
+    .container {
+        display: flex;
+        gap: 30px;
+        background-color: #2179FFFF;
+        border-bottom: 10px;
+        border-radius: 4px;
+        padding: 15px;
+        color: white;
+        max-width: fit-content;
+
+        flex-wrap: wrap;
+
+        // .accountTable {
+        //     flex: 1 1 60%;
+    
+        // }
+    }
+    
+}
+
+.inputArea {
+    display: inline-flex;
+    width: 100%; 
+    height: 35px;
+    border-radius: 4px;
+    margin-top: 4px;
+    outline-color: grey;
+    border-color: white;
+}
+
+.formAddAccount {
+    margin: 10px;
+}
+
+.role {
+    margin-right: 20px;
+}
+
+.radio {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.addButton {
+    width: 200px;
+    padding: 5px 10px;
+    background-color: white;
+    border: 1px solid #2179FFFF;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px;
+    color: #2179FFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s all;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+}
+
+// .newAccount {
+//     background-color: #297FE2FF;
+//     padding: 50px;
+//     border-radius: 4px;
+// }
+
+// .addButton:hover {
+//     background-color: #2179FFFF;
+//     color: white;
+//     border: 1px solid #2179FFFF;
+
+// }
+
+// .Addbutton{
+//     width: 100%;
+//     display: flex;
+//     justify-content: right;
+// }
+
+// ccc
+.inputArea[type=text], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #2179FFFF;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .inputTextArea[type=text-area], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #2179FFFF;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .updateButton[type=submit] {
+    width: 100%;
+    background-color: #2179FFFF;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .updateButton[type=submit]:hover {
+    background-color: #6495ED;
+  }
+  
+  .form {
+    border-radius: 5px;
+    background-color:  white;
+    padding: 20px;
+    color: #2179FFFF;
+  }

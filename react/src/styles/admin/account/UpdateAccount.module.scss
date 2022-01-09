@@ -1,0 +1,102 @@
+.header2 {
+    margin: 0px;
+}
+
+.header5 {
+    margin-top: 0px;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.inputData[type=text], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #2179FFFF;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+.inputTextArea[type=text-area], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #2179FFFF;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+  
+.updateButton[type=submit] {
+    width: fit-content;
+    padding: 6px 10px;
+    background-color: #2179FFFF;
+    border: 2px solid #2179FFFF;
+    text-align: center;
+    border-radius: 4px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s all;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+    
+    // width: 20%;
+    // background-color: white;
+    // border-color: #2179FFFF;
+    // color: #2179FFFF;
+    // padding: 14px 20px;
+    // margin: 8px 0;
+    // border-radius: 4px;
+    // cursor: pointer;
+}
+  
+//   .updateButton[type=submit]:hover {
+//     //background-color: #6495ED;
+//     background-color: #2179FFFF;
+//     color: white;
+//     border: 1px solid #2179FFFF;
+//   }
+
+.backButton[type=submit] {
+    width: fit-content;
+    padding: 5px 10px;
+    background-color: white;
+    border: 2px solid #2179FFFF;
+    text-align: center;
+    border-radius: 4px;
+    color: #2179FFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s all;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+}
+  
+//   .backButton[type=submit]:hover {
+//     //background-color: #6495ED;
+//     background-color: #2179FFFF;
+//     color: white;
+//     border: 1px solid #2179FFFF;
+//   }
+  
+.form {
+    border-radius: 5px;
+    background-color:  white;
+    padding: 20px;
+    color: #2179FFFF;
+    font-weight: bold;
+}
+
+.wrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 20px;
+    gap: 20px;
+}

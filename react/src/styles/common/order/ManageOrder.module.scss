@@ -1,0 +1,94 @@
+.container{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.header{
+    width: 100%;
+    height: fit-content;
+    padding: 10px;
+    display: flex;
+    background-color: #2179FFFF;
+    color: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 10px;
+}
+
+.labeled{
+    width: 70%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.title{
+    width: 100%;
+}
+
+.subTitle{
+    width: 100%;
+}
+
+.buttons{
+    width: 30%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+}
+
+.but{
+    background-color: white;
+    color: #2961E2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: .2s all;
+    cursor: pointer;
+    user-select: none;
+}
+
+.but:hover{
+    background-color: #2961E2;
+    color: white;
+    border: 2px solid white;
+
+}
+
+.summary{
+    width: 100%;
+    height: fit-content;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.sumBox{
+    width: 200px;
+    height: 100px;
+    border: 2px solid #2179FFFF;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.numLabel{
+    font-size: 30px;
+    text-align: center;
+    padding-top: 5px;
+}
+
+.orderTable{
+    width: 100%;
+    height: fit-content;
+    padding: 10px 30px;
+}

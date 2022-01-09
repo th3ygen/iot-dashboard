@@ -1,0 +1,116 @@
+.container {
+    margin-left: 200px;
+    
+    height: 75px;
+    width: calc(100% - 200px);
+
+    display: flex;
+    align-items: center;
+}
+
+.bar {
+    width: calc(100% - 30px);
+    height: 50px;
+
+    border-radius: 0 10px 10px 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #2961E2;
+
+    .back {
+        display: flex;
+        gap: 10px;
+
+        align-items: center;
+        justify-content: center;
+
+        color: white;
+
+        padding: 5px 20px;
+
+        cursor: pointer;
+        user-select: none;
+
+        // loop animation for icon on hover
+        // animation:
+        // move left to right
+        &:hover {
+            animation: loop 1s infinite;
+
+            @keyframes loop {
+                0% {
+                    transform: translateX(0);
+                }
+                50% {
+                    transform: translateX(10px);
+                }
+                100% {
+                    transform: translateX(0);
+                }
+            }
+        }
+
+    }
+
+    .head {
+        padding: 0 30px;
+
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .title {
+            text-transform: capitalize;
+            color: white;
+            font-weight: bold;
+        }
+    }
+
+    .user-action {
+        padding: 0 20px;
+
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        color: white;
+
+        .logout {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            font-size: .9rem;
+            padding: 5px 10px;
+            
+            color: #2961E2;
+            background: white;
+
+            border-radius: 5px;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+
+            background: #FFF;
+
+
+            transition: .3s all;
+            &:hover {
+                cursor: pointer;
+                transform: scale(1.1)
+            }
+        }
+    }
+}
