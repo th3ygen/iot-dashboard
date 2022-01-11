@@ -10,11 +10,12 @@
     
     .headers {
         display: flex;
-        justify-content: space-between;
         
         padding-right: 12px;
 
         margin-bottom: 10px;
+
+        width: 100%;
 
         .header {
             color: #2179FF;
@@ -25,7 +26,10 @@
                 flex: 1 1 10%;
             }
             &:nth-child(2) {
-                flex: 1 1 80%;
+                flex: 1 1 10%;
+            }
+            &:nth-child(3) {
+                flex: 1 1 70%;
             }
         }
     }
@@ -53,7 +57,10 @@
                 flex: 1 1 10%;
             }
             div:nth-child(2) {
-                flex: 1 1 80%;
+                flex: 1 1 10%;
+            }
+            div:nth-child(3) {
+                flex: 1 1 70%;
             }
         }
     }

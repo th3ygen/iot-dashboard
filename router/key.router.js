@@ -10,9 +10,11 @@ const controllers = {
     key: require('../controllers/key.controller'),
 };
 
+router.get('/owned', middlewares.auth.verifyJWT, controllers.key.getOwned);
+
 router.post('/create', middlewares.auth.verifyJWT, async (req, res) => {
     try {
-        const result = await controllers.key.create(req.payload.username, req.payload.id);
+        const result = await controllers.key.create(req.body.label, req.payload.username, req.payload.id);
         res.status(200).json(result);
     } catch (err) {
         _helper.log(`Unable to create key: ${err.message}`, 'error', 'red');
@@ -34,6 +36,16 @@ router.get('/test', async (req, res) => {
     }
 });
 
+router.post('/rename', middlewares.auth.verifyJWT, async (req, res) => {
+    try {
+        const result = await controllers.key.rename(req.body.id, req.body.label);
+        res.status(200).json(result);
+    } catch (err) {
+        _helper.log(`Unable to rename key: ${err.message}`, 'error', 'red');
+        res.status(500).json(err);
+    }
+});
+
 router.get('/find', middlewares.auth.verifyJWT, async (req, res) => {
     try {
         const { id } = req.payload;
@@ -44,5 +56,7 @@ router.get('/find', middlewares.auth.verifyJWT, async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
+router.delete('/delete/:id', middlewares.auth.verifyJWT, controllers.key.delete);
 
 module.exports = router;

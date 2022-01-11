@@ -119,7 +119,7 @@ function Table({ ...props }) {
 						className={styles.data}
 						style={{
 							width: `${
-								actions
+								(actions && actions.length > 0)
 									? "calc(100% - 115px)"
 									: "calc(100% - 50px)"
 							}`,
@@ -140,7 +140,7 @@ function Table({ ...props }) {
 							</div>
 						))}
 					</div>
-					{actions && <div className={styles.col} style={{textAlign: "center"}}>Actions</div>}
+					{(actions && actions.length > 0) && <div className={styles.col} style={{textAlign: "center"}}>Actions</div>}
 				</div>
 				<div className={styles.rows}>
 					{items.map((i, x) => (
@@ -152,7 +152,7 @@ function Table({ ...props }) {
 								className={styles.data}
 								style={{
 									width: `${
-										actions
+										(actions && actions.length > 0)
 											? "calc(100% - 115px)"
 											: "calc(100% - 50px)"
 									}`,
@@ -210,7 +210,7 @@ function Table({ ...props }) {
 									</div>
 								))}
 							</div>
-							{actions && (
+							{(actions && actions.length > 0) && (
 								<div className={styles.actions}>
 									{actions.map((item, y) => (
 										<Tippy key={y} content={item.tooltip} delay={[500, 0]} duration={[100, 100]} animation="scale" inertia="true">

@@ -53,6 +53,7 @@ function LineChart({ ...props }) {
 					valueYField: field,
 					valueXField: "date",
 					tooltip: am5.Tooltip.new(root, {}),
+					stroke: am5.color("#2179FF"),
 				})
 			);
 
@@ -61,6 +62,7 @@ function LineChart({ ...props }) {
 					sprite: am5.Circle.new(root, {
 						radius: 5,
 						fill: series.get("fill"),
+						stroke: am5.color("#FFF"),
 					}),
 				});
 			});
@@ -71,6 +73,9 @@ function LineChart({ ...props }) {
 				.get("tooltip")
 				.label.set("text", "[bold]{name}[/]: {valueY}");
 
+
+			series.appear(1000);
+			chart.appear(1000, 100);
 			ch.current = series;
 		}
 
@@ -98,6 +103,14 @@ function LineChart({ ...props }) {
 				themeTags: ["axis"],
 			})
 		);
+
+		// change series label font color
+		xAxis.get('renderer').labels.template.set('fill', am5.color('#888'));
+		yAxis.get('renderer').labels.template.set('fill', am5.color('#888'));
+
+		// change grid color
+		xAxis.get('renderer').grid.template.set('stroke', am5.color('#aaa'));
+		yAxis.get('renderer').grid.template.set('stroke', am5.color('#eee'));
 
 		return () => {
 			root.dispose();

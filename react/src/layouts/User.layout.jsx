@@ -66,7 +66,7 @@ export default function UserLayout(props) {
 			navigate("/");
 		} */
 		setUser({
-			token: 'yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFpZGlsIiwiaWQiOiI2MWRhOWE2ZTE1YWUyYTA4ZTBiMTQ3YzMiLCJpYXQiOjE2NDE3MTY0Nzd9.n4vDCCjdVZL136g0-eeFQMM7UzOmdXLtD0v-OaSKmM0',
+			token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVkZWwiLCJpZCI6IjYxMGFiNjc5NGZiZWQxNjkzOGFmZTZjMyIsImlhdCI6MTY0MTc5MDgyMH0.KJXsw1wiYyN8eiRFVLMkwvr1y9mdHiWnl86s3_WwF3I',
 			username: 'admin',
 		})
 	}, []);

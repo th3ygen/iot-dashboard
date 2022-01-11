@@ -6,8 +6,8 @@ function AddApiKeysPage() {
     return (
         <div className={styles.container}>
             <PageHeader
-                title="Add API keys"
-                brief="Add new API keys to your account"
+                title="Create a API key"
+                brief="Add new API keys to your account, allowing you to access the system API endpoints"
                 navs={[
                     {
                         name: "API keys",
@@ -16,7 +16,9 @@ function AddApiKeysPage() {
                     },
                 ]}
             />
-            <div className={styles.content}></div>
+            <div className={styles.content}>
+                
+            </div>
         </div>
     )
 }

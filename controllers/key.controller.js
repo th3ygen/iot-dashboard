@@ -9,8 +9,8 @@ const verifyKey = async key => {
 };
 
 module.exports = {
-    create: async (username, id) => {
-        const key = await Key.createKey(username, id);
+    create: async (label, username, id) => {
+        const key = await Key.createKey(label, username, id);
 
         return key;
     },
@@ -25,6 +25,37 @@ module.exports = {
             pass: key.getKey(),
             channels: key.channels
         }));
+    },
+    getOwned: async (req, res) => {
+        try {
+            const { id } = req.payload;
+           
+            const keys = (await Key.find({ ownerId: id})).map(key => ({
+                id: key._id,
+                pass: key.getKey(),
+                label: key.label,
+                createdAt: key.createdAt,
+            }));
+
+            res.status(200).json(keys);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    },
+    rename: async (id, label) => {
+        const key = await Key.rename(id, label);
+
+        return key;
+    },
+    
+    delete: async (req, res) => {
+        try {
+            await Key.delete(req.params.id);
+
+            res.status(200).json({ message: 'Key deleted' });
+        } catch (e) {
+            res.status(500).json({ message: e.message });
+        }
     },
     addChannel: async (id, channel) => {
         const key = await Key.findById(id);

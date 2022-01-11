@@ -6,7 +6,7 @@ const router = express.Router();
 const middleware = require('../../middlewares/auth.middleware');
 
 /* Restricted access */
-private.post('/create', );
+/* private.post('/create', ); */
 
 /* Public access */
 

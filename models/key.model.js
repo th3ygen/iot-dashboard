@@ -6,23 +6,20 @@ const _helper = require('../helpers/basic.helper');
 const hat = require('hat');
 
 const schema = new Schema({
+    label: String,
     pass: String,
     ref: String,
     ownerId: mongoose.Types.ObjectId,
-    channels: [{
-        id: mongoose.Types.ObjectId,
-        role: Number
-    }]
 }, { timestamps: true });
 
-schema.statics.createKey = async (username, ownerId) => {
+schema.statics.createKey = async (label, username, ownerId) => {
     try {
         const ref = `${username}_${crypto.randomBytes(4).toString('hex')}`;
 
         const key = new Key({
+            label,
             ref,
             ownerId,
-            channels: []
         });
 
         const pass = hat();
@@ -74,6 +71,19 @@ schema.methods.addChannel = async function(channelId, role) {
         return this;
     } catch (e) {
         _helper.log(`Unable to add channel to key: ${e.message}`, 'error', 'red');
+        return {};
+    }
+};
+
+schema.statics.rename = async (id, label) => {
+    try {
+        const key = await Key.findById(id);
+        key.label = label;
+        await key.save();
+        
+        return key;
+    } catch (e) {
+        _helper.log(`Unable to rename key: ${e.message}`, 'error', 'red');
         return {};
     }
 };

@@ -35,6 +35,8 @@ import BrowseDataPage from "page/user/BrowseData";
 // User -> Channels
 import ChannelPage from "page/user/channel/Channel";
 import AddChannelPage from "page/user/channel/AddChannel";
+import ChannelKeysPage from "page/user/channel/ApiKey";
+import ViewChannelPage from "page/user/channel/View";
 // User -> Webhooks
 import WebhooksPage from "page/user/webhook/Webhooks";
 import AddWebhookPage from "page/user/webhook/AddWebhook";
@@ -81,6 +83,8 @@ function App() {
 						path="/user/channels/add"
 						element={<AddChannelPage />}
 					/>
+					<Route path="/user/channels/view" element={<ViewChannelPage />} />
+					<Route path="/user/channels/key" element={<ChannelKeysPage />} />
 					{/* User -> Webhooks */}
 					<Route path="/user/webhooks/add" element={<AddWebhookPage />} />
 					<Route path="/user/webhooks" element={<WebhooksPage />} />

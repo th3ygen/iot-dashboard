@@ -7,37 +7,16 @@ const middleware = {
     jwt: require('../middlewares/auth.middleware')
 }
 
-/* GET /validateid 
-(
-    id: channel id
-)
-*/
 router.get('/owned', middleware.jwt.verifyJWT, controller.channel.getOwned);
+router.get('/id/:id', middleware.jwt.verifyJWT, controller.channel.getById);
 
-/* GET /validateid 
-(
-    id: channel id
-)
-*/
 router.get('/validateid', controller.channel.validateId);
 
-/* POST /create
-(
-    id: channel id,
-    title: channel title,
-    description: channel description,
-    field: field[0] name,
-    fieldDesc: field[0] description
-) 
-*/
 router.post('/create', middleware.jwt.verifyJWT, controller.channel.create);
 
-/* POST /addfield
-(
-    id: channel id
-    label: field label/name
-)
-*/
 router.post('/addfield', middleware.jwt.verifyJWT, controller.channel.addField);
+router.post('/updatekeys', middleware.jwt.verifyJWT, controller.channel.updateKeys);
+router.delete('/delete/:id', middleware.jwt.verifyJWT, controller.channel.delete);
+
 
 module.exports = router;

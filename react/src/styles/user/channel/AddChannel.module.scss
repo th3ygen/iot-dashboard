@@ -1,0 +1,173 @@
+@keyframes anvil {
+	0% {
+		transform: scale(1) translateY(0px);
+		opacity: 0;
+		box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+	}
+	1% {
+		transform: scale(0.96) translateY(10px);
+		opacity: 0;
+		box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+	}
+	100% {
+		transform: scale(1) translateY(0px);
+		opacity: 1;
+		box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+	}
+}
+
+.form {
+	width: 100%;
+	padding: 30px 30px;
+
+	background: #21252e;
+
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+	.item {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+
+		label {
+			font-size: 14px;
+			font-weight: 500;
+		}
+
+		.group {
+			padding: 20px;
+
+			border: 1px dashed #2179ff;
+
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		.list {
+			display: flex;
+			gap: 10px;
+
+			flex-wrap: wrap;
+
+			.li {
+				background: #161524;
+				color: #828a99;
+
+				border: 1px solid #2179ff;
+
+				border-radius: 4px;
+
+				display: flex;
+
+                animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+
+                cursor: pointer;
+                user-select: none;
+
+				overflow: hidden;
+
+				& .num {
+					padding: 4px 12px;
+					font-size: 12px;
+					display: flex;
+					align-items: center;
+
+					border-right: 1px solid #828a99;
+
+					background: #2179ff;
+
+					color: white;
+				}
+
+				& .name {
+					display: flex;
+					align-items: center;
+
+					padding: 0 10px;
+
+					color: #828a99;
+
+					font-size: 15px;
+				}
+			}
+		}
+	}
+}
+
+input, select {
+	border-radius: 4px;
+	padding: 8px 15px;
+
+	outline: none;
+
+	background: #161524;
+
+	color: #828a99;
+
+    border: 1px solid #2179ff;
+
+}
+
+select {
+	color: white !important;
+}
+
+.button {
+	background: #2179ff;
+	padding: 0 20px;
+
+	display: flex;
+	align-items: center;
+
+	font-size: 14px;
+
+	border-radius: 0 6px 6px 0;
+
+	// sharp shadow
+	box-shadow: 0px 0px 0px 0 #2179ffff;
+
+	cursor: pointer;
+	user-select: none;
+
+	transition: 0.3s all;
+	&:hover {
+		background: #2179ff;
+		color: white;
+		box-shadow: 0px 0px 20px 0px #2179ffff;
+	}
+}
+
+.ingroup {
+	display: flex;
+
+	select {
+		color: rgb(161, 14, 180);
+		border-radius: 6px 0 0 6px;
+	}
+
+	input {
+		flex: 1 1 80%;
+
+		border-radius: 0;
+	}
+}
+
+.addBtn {
+    width: 100%;
+
+    align-items: flex-end !important;
+
+    div {
+        width: fit-content;
+    }
+}
+
+.keys {
+	display: flex;
+	flex-direction: column;
+
+	gap: 20px;
+}

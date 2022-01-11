@@ -4,15 +4,15 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     title: String,
-    channelId: {
+    /* channelId: {
         type: String,
         required: true
-    },
+    }, */
     description: String,
     image: String,
     fields: [{
         label: String,
-        description: String,
+        dataType: String,
         summary: {
             count: Number,
             range: {
@@ -27,7 +27,10 @@ const schema = new Schema({
             variance: Number
         }
     }],  
-    
+    keys: {
+        r: mongoose.Types.ObjectId,
+        w: mongoose.Types.ObjectId,
+    },
     ownerId: mongoose.Types.ObjectId,
     uniqueId: String
 }, { timestamps: true });
@@ -38,21 +41,35 @@ schema.statics.isIdUnique = async id => {
     return !channel;
 }
 
-schema.statics.add = async (title, ownerId, channelId, description, field, fieldDesc) => {
+schema.statics.add = async (title, description, fields, ownerId) => {
     try {
+        console.log({
+            title,
+            description,
+            image: '',
+            fields: fields.map(field => (
+                {
+                    label: field.label,
+                    type: field.type,
+                }
+            )),
+            ownerId,
+        });
         const uniqueId = uniqid();
         const channel = new Channel({
             title,
-            channelId,
             description,
             image: '',
-            fields: [{
-                label: field,
-                description: fieldDesc
-            }],
+            fields: fields.map(field => (
+                {
+                    label: field.label,
+                    dataType: field.type,
+                }
+            )),
             ownerId,
             uniqueId
         });
+
 
         await channel.save();
 
@@ -86,7 +103,9 @@ schema.methods.addField = async function(label) {
         }
     });
 
-    this.save();
+    await this.save();
+
+    return this;
 };
 
 schema.methods.removeField = async label => {
@@ -101,6 +120,14 @@ schema.methods.removeField = async label => {
     }
 
     this.fields.splice(this.fields.indexOf(field), 1);
+};
+
+schema.methods.updateKeys = async function(keys) {
+    this.keys = keys;
+
+    await this.save();
+
+    return this;
 };
 
 const Channel = mongoose.model('Channel', schema);

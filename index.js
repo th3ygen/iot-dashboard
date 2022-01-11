@@ -1,44 +1,58 @@
 // load .env
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const helper = require('./helpers/basic.helper');
+const express = require("express");
+const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
+const helper = require("./helpers/basic.helper");
+const PrettyError = require("pretty-error");
 
-const app = express();
-/* const server = require('https').createServer({
-    cert: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.crt`)),
-    key: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.key`))
-}, app); */
-
-app.use(cors());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const pe = new PrettyError();
 
 (async () => {
-    try {
-        helper.log(`connecting to broker, url: ${process.env.MQTT_URL} port: ${process.env.MQTT_PORT}`, 'mqtt', 'green');
-        await require('./services/mqtt.service').connect();
-        helper.log('connected', 'mqtt', 'green');
+	try {
+        const app = express();
+        /* const server = require('https').createServer({
+            cert: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.crt`)),
+            key: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.key`))
+        }, app); */
 
-        helper.log(`connecting to MongoDB server, url: ${process.env.DB_URL}`, 'mongodb', 'green');
-        await require('./services/db.service').init();
-        helper.log('connected', 'mongodb', 'green');
-    } catch (e) {
-        helper.log(e.msg, e.label, 'red');
-        helper.log('Aborted, Ctrl+C to end the process', 'server', 'red');
+        app.use(cors());
+        app.use(express.urlencoded({ extended: false }));
+        app.use(express.json());
 
-        return;
-    }
+		helper.log(
+			`connecting to broker, url: ${process.env.MQTT_URL} port: ${process.env.MQTT_PORT}`,
+			"mqtt",
+			"green"
+		);
+		await require("./services/mqtt.service").connect();
+		helper.log("connected", "mqtt", "green");
 
-    require('./models');
+		helper.log(
+			`connecting to MongoDB server, url: ${process.env.DB_URL}`,
+			"mongodb",
+			"green"
+		);
+		await require("./services/db.service").init();
+		helper.log("connected", "mongodb", "green");
 
-    app.use('/api', require('./router'));
+		require("./models");
 
-    app.listen(process.env.PORT, () => {
-        helper.log(`Server started, listening on port ${process.env.PORT}`, 'server', 'green');
-    });
+		app.use("/api", require("./router"));
+
+		app.listen(process.env.PORT, () => {
+			helper.log(
+				`Server started, listening on port ${process.env.PORT}`,
+				"server",
+				"green"
+			);
+		});
+	} catch (e) {
+        helper.log(pe.render(e), e.label, "red");
+		helper.log("Aborted, Ctrl+C to end the process", "server", "red");
+
+		return;
+	}
 })();
-
