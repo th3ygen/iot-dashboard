@@ -110,28 +110,14 @@ function ChannelPage() {
 							icon: "FaEdit",
 							tooltip: "Edit",
 							callback: async (n) => {
-								
+								navigate('/user/channels/edit', { replace: true, state: { id: n }});
 							},
 						},
 						{
-							icon: "FaTrash",
-							tooltip: "Delete",
+							tooltip: "Manage filters",
+							icon: "FaFilter",
 							callback: async (n) => {
-								const request = await fetch(
-									"http://localhost:8080/api/channel/delete/" +
-										n,
-									{
-										method: "DELETE",
-										headers: {
-											"Content-Type": "application/json",
-											auth: user.token,
-										},
-									}
-								);
-
-                                if (request.status === 200) {
-                                    setChannels(channels.filter((channel) => channel[0] !== n));
-                                }
+								navigate('/user/channels/filters', { replace: true, state: { id: n }});
 							},
 						},
 						{
@@ -142,7 +128,7 @@ function ChannelPage() {
 							},
 						},
 						{
-							tooltip: "API key",
+							tooltip: "Manage API key",
                             callback: (n) => {
                                 navigate('/user/channels/key', { replace: true, state: { id: n } });
                             },

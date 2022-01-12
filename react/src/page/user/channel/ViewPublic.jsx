@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import PageHeader from "components/PageHeader.component";
 import DateAxisLineChart from "components/DateAxisLineChart.component";
@@ -7,6 +8,9 @@ import FolderCard from "components/FolderCard";
 import styles from "styles/user/channel/View.module.scss";
 
 function ViewChannel() {
+	const location = useLocation();
+
+	const [channel, setChannel] = useState({});
 	const [data, setData] = useState([
 		{
 			date: new Date(2021, 0, 1).getTime(),
@@ -73,6 +77,25 @@ function ViewChannel() {
 	}, [log]);
 
 	useEffect(() => {
+		(async () => {
+			if (location.state.id) {
+				const request = await fetch(`http://localhost:8080/api/channel/public/${location.state.id}`, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
+	
+				if (request.status === 200) {
+					const response = await request.json();
+	
+					setChannel(response);
+				}
+			}
+		})();
+	}, [location.state.id]);
+
+	useEffect(() => {
 		// smooth scroll to top
 		window.scrollTo(0, 0);
 	}, []);
@@ -86,12 +109,12 @@ function ViewChannel() {
 	return (
 		<div className="container">
 			<PageHeader
-				title="View Channel"
-				brief="View your channel"
+				title={channel.title || 'Loading...'}
+				brief={channel.description || 'Loading...'}
 				navs={[
 					{
-						name: "Channels",
-						path: "/user/channels",
+						name: "Browse channels",
+						path: "/user/browse",
 						icon: "FaStream",
 					},
 				]}
@@ -102,7 +125,7 @@ function ViewChannel() {
 						<div className={styles.col}>
 							<div className={styles.item}>
 								<div className={styles.label}>Channel name</div>
-								<div className={styles.value}>Channel name</div>
+								<div className={styles.value}>{channel.title}</div>
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Owner</div>
@@ -112,7 +135,7 @@ function ViewChannel() {
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Total fields</div>
-								<div className={styles.value}>13</div>
+								<div className={styles.value}>{(channel.fields && channel.fields.length) || 0}</div>
 							</div>
 						</div>
 						<div className={styles.col}>
@@ -133,11 +156,10 @@ function ViewChannel() {
 				</FolderCard>
 
 				<DateAxisLineChart
-					title="Field: number"
+					title="Field: temp"
 					data={data}
 					label="Profit"
 					height="250px"
-					stepped={true}
 				/>
 
 				<FolderCard title="Live update">

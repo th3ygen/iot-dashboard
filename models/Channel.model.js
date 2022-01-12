@@ -13,6 +13,7 @@ const schema = new Schema({
     fields: [{
         label: String,
         dataType: String,
+        filterId: mongoose.Types.ObjectId,
         summary: {
             count: Number,
             range: {
@@ -77,6 +78,32 @@ schema.statics.add = async (title, description, fields, ownerId) => {
     } catch (e) {
         throw new Error(e);
     }
+};
+
+schema.statics.assignFilters = async (channelId, fields) => {
+    const channel = await Channel.findById(channelId);
+
+    if (!channel) {
+        throw new Error('Channel not found');
+
+        return;
+    }
+
+    channel.fields.forEach(field => {
+        const fieldToUpdate = fields.find(q => (q.field === field.label));
+
+        if (fieldToUpdate) {
+            if (mongoose.Types.ObjectId.isValid(fieldToUpdate.filterId)) {
+                field.filterId = mongoose.Types.ObjectId(fieldToUpdate.filterId);
+            } else {
+                field.filterId = null;
+            }
+        }
+    });
+
+    await channel.save();
+
+    return channel;
 };
 
 schema.methods.addField = async function(label) {

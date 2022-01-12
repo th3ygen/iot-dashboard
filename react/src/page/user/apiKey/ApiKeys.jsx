@@ -156,7 +156,7 @@ function ApiKeysPage() {
 					title="Manage API keys"
 					headers={["Label", "API Key", "Created at"]}
 					items={keys}
-					colWidthPercent={["30%", "30%", "10%"]}
+					colWidthPercent={["20%", "40%", "10%"]}
 					actions={[
 						{
 							tooltip: "Rename",

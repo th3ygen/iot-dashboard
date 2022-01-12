@@ -35,8 +35,11 @@ import BrowseDataPage from "page/user/BrowseData";
 // User -> Channels
 import ChannelPage from "page/user/channel/Channel";
 import AddChannelPage from "page/user/channel/AddChannel";
+import EditChannelPage from "page/user/channel/EditChannel";
 import ChannelKeysPage from "page/user/channel/ApiKey";
+import ChannelFiltersPage from "page/user/channel/Filters";
 import ViewChannelPage from "page/user/channel/View";
+import ViewPublicChannelPage from "page/user/channel/ViewPublic";
 // User -> Webhooks
 import WebhooksPage from "page/user/webhook/Webhooks";
 import AddWebhookPage from "page/user/webhook/AddWebhook";
@@ -49,6 +52,7 @@ import AddApiKeyPage from "page/user/apiKey/AddApiKeys";
 // User -> Filters
 import FiltersPage from "page/user/filter/Filters";
 import AddFilterPage from "page/user/filter/AddFilter";
+import EditFilterPage from "page/user/filter/EditFilter";
 
 function Home() {
 	return (
@@ -83,8 +87,14 @@ function App() {
 						path="/user/channels/add"
 						element={<AddChannelPage />}
 					/>
+					<Route
+						path="/user/channels/edit"
+						element={<EditChannelPage />}
+					/>
 					<Route path="/user/channels/view" element={<ViewChannelPage />} />
+					<Route path="/user/channels/view/public" element={<ViewPublicChannelPage />} />
 					<Route path="/user/channels/key" element={<ChannelKeysPage />} />
+					<Route path="/user/channels/filters" element={<ChannelFiltersPage />} />
 					{/* User -> Webhooks */}
 					<Route path="/user/webhooks/add" element={<AddWebhookPage />} />
 					<Route path="/user/webhooks" element={<WebhooksPage />} />
@@ -97,6 +107,7 @@ function App() {
 					{/* User -> Filters */}
 					<Route path="/user/filters" element={<FiltersPage />} />
 					<Route path="/user/filters/add" element={<AddFilterPage />} />
+					<Route path="/user/filters/edit" element={<EditFilterPage />} />
 					{/* <Route path="inventory" element={<ManageInventoryPage />} />
 					<Route path="/user/inventory/add" element={<InventoryAddItemPage />} />
 					<Route path="/user/inventory/edit" element={<InventoryEditItemPage />} />

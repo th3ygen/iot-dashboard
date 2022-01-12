@@ -21,6 +21,38 @@ module.exports = {
 			});
 		}
 	},
+	getPublic: async (req, res) => {
+		try {
+			const channel = await Channel.findOne({ uniqueId: req.params.id });
+
+			return res.status(200).json(channel);
+		} catch (e) {
+			helper.log(pe.render(e), "ROUTE: /api/channel/getPublic", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	getAllPublic: async (req, res) => {
+		try {
+			const channels = await Channel.find({});
+
+			return res.status(200).json(channels.map(channel => ({
+				id: channel.uniqueId,
+				title: channel.title,
+				description: channel.description,
+				image: channel.image,
+				views: 0,
+				likes: 0,
+				comments: 0
+			})));
+		} catch (e) {
+			helper.log(pe.render(e), "ROUTE: /api/channel/getAllPublic", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
 	getById: async (req, res) => {
 		try {
 			const { id } = req.params;
@@ -57,6 +89,29 @@ module.exports = {
 			});
 		} catch (e) {
 			helper.log(e.stack, "ROUTE: /api/channel/create", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	update: async (req, res) => {
+		try {
+			const { title, description, fields } = req.body;
+
+			const channel = await Channel.findByIdAndUpdate(req.params.id, {
+				title,
+				description,
+				fields: fields.map(field => (
+					{
+						label: field.label,
+						dataType: field.dataType,
+					}
+				))
+			});
+
+			return res.status(200).json(channel);
+		} catch (e) {
+			helper.log(pe.render(e), "ROUTE: /api/channel/update", "red");
 			res.status(500).json({
 				msg: e,
 			});
@@ -164,6 +219,22 @@ module.exports = {
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/delete", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	assignFilters: async (req, res) => {
+		try {
+			const { id, filters } = req.body;
+
+			await Channel.assignFilters(id, filters);
+
+			res.status(200).json({
+				msg: 'filters assigned'
+			});
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/assignFilters", "red");
 			res.status(500).json({
 				msg: e,
 			});

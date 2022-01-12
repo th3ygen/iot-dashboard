@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom";
+import { useOutletContext, useNavigate, useLocation } from "react-router-dom";
 import { Parser } from "expr-eval";
 import Tippy from "@tippyjs/react";
 import Popup from "reactjs-popup";
@@ -14,10 +14,12 @@ import "tippy.js/animations/scale.css";
 import "tippy.js/animations/shift-away.css";
 
 function AddDevicePage() {
-    const navigate = useNavigate();
-    const [user, setUser] = useOutletContext();
+	const location = useLocation();
+	const navigate = useNavigate();
 
-    const filterNameRef = useRef();
+	const [user, setUser] = useOutletContext();
+
+	const filterNameRef = useRef();
 	const varNameRef = useRef();
 	const varValueRef = useRef();
 	const varGroupRef = useRef();
@@ -46,11 +48,11 @@ function AddDevicePage() {
 		}
 	};
 
-    const removeVar = (field) => {
-        const newVars = [...vars];
-        newVars.splice(newVars.indexOf(field), 1);
-        setVars(newVars);
-    }
+	const removeVar = (field) => {
+		const newVars = [...vars];
+		newVars.splice(newVars.indexOf(field), 1);
+		setVars(newVars);
+	};
 
 	const testRun = () => {
 		try {
@@ -66,7 +68,9 @@ function AddDevicePage() {
 
 			const result = parser.evaluate(variables);
 
-            let out = `RESULT\n\nVariables: ${parser.variables().join(', ')}\n${str}\n=${result}`;
+			let out = `RESULT\n\nVariables: ${parser
+				.variables()
+				.join(", ")}\n${str}\n=${result}`;
 
 			resultRef.current.value = out;
 		} catch (e) {
@@ -74,68 +78,98 @@ function AddDevicePage() {
 		}
 	};
 
-    const validateExpr = () => {
-        if (vars.length === 0) {
-            return false;
-        }
+	const validateExpr = () => {
+		if (vars.length === 0) {
+			return false;
+		}
 
-        try {
-            const str = exprRef.current.value;
+		try {
+			const str = exprRef.current.value;
 
-            const parser = Parser.parse(str);
+			const parser = Parser.parse(str);
 
-            const variables = {};
+			const variables = {};
 
-            vars.forEach((varObj) => {
-                variables[varObj.name] = varObj.value;
-            });
+			vars.forEach((varObj) => {
+				variables[varObj.name] = varObj.value;
+			});
 
-            parser.evaluate(variables);
+			parser.evaluate(variables);
 
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
+			return true;
+		} catch (e) {
+			return false;
+		}
+	};
 
-    const addFilter = async () => {
-        try {
-            const isExpressionValid = validateExpr();
+	const updateFilter = async () => {
+		try {
+			const isExpressionValid = validateExpr();
 
-            if (!isExpressionValid) {
-                throw new Error("Expression is not valid");
-            }
+			if (!isExpressionValid) {
+				throw new Error("Expression is not valid");
+			}
 
-            const fields = vars.map(v => (v.name));
+			const fields = vars.map((v) => v.name);
 
-            const request = await fetch('http://localhost:8080/api/filter/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    auth: user.token,
-                },
-                body: JSON.stringify({
-                    label: filterNameRef.current.value,
-                    expression: exprRef.current.value,
-                    fields,
-                    ownderId: user.id,
-                })
-            })
+			const request = await fetch(
+				"http://localhost:8080/api/filter/update",
+				{
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+						auth: user.token,
+					},
+					body: JSON.stringify({
+						id: location.state.id,
+						label: filterNameRef.current.value,
+						expression: exprRef.current.value,
+						fields,
+					}),
+				}
+			);
 
-            if (request.status === 200) {
-                navigate('/user/filters', { replace: true });
-            }
+			if (request.status === 200) {
+				navigate("/user/filters", { replace: true });
+			}
+		} catch (e) {
+			alert("Error creating filter: " + e);
+		}
+	};
 
-        } catch(e) {
-            alert('Error creating filter: ' + e);
-        }
-    };
+	useEffect(() => {
+		(async () => {
+			if (location.state.id && user.token) {
+				let req, res;
+
+				req = await fetch(
+					"http://localhost:8080/api/filter/id/" + location.state.id,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							auth: user.token,
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					setVars(res.fields.map((f) => ({ name: f, value: 0 })));
+
+					filterNameRef.current.value = res.label;
+					exprRef.current.value = res.expression;
+				}
+			}
+		})();
+	}, [location.state.id, user.token]);
 
 	return (
 		<div className="container">
 			<PageHeader
-				title="Create a new filter"
-				brief="Filter your channel fields in real-time, get the data that you really need"
+				title="Edit filter"
+				brief="Customize your filter"
 				navs={[
 					{
 						name: "Filters",
@@ -148,7 +182,7 @@ function AddDevicePage() {
 				<div className={styles.form}>
 					<div className={styles.item}>
 						<div className={styles.label}>Filter name</div>
-						<input type="text" ref={filterNameRef}/>
+						<input type="text" ref={filterNameRef} />
 					</div>
 					<div className={styles.item}>
 						<div className={styles.label}>
@@ -192,7 +226,7 @@ function AddDevicePage() {
 										textarea
 										placeholder="RESULT"
 										ref={resultRef}
-                                        disabled
+										disabled
 									></textarea>
 								</div>
 							</div>
@@ -207,7 +241,10 @@ function AddDevicePage() {
 										key={index}
 										content="Click to remove"
 									>
-										<div className={styles.var} onClick={() => removeVar(v)}>
+										<div
+											className={styles.var}
+											onClick={() => removeVar(v)}
+										>
 											<div>{v.name}</div>
 											<div>{v.value}</div>
 										</div>
@@ -225,8 +262,8 @@ function AddDevicePage() {
 						</div>
 					</div>
 
-					<div className={styles.item} onClick={addFilter}>
-						<div className="neon-btn">Add filter</div>
+					<div className={styles.item} onClick={updateFilter}>
+						<div className="neon-btn">Update filter</div>
 					</div>
 				</div>
 			</div>

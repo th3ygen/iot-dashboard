@@ -1,9 +1,53 @@
+import { useEffect, useState } from "react";
+import { useOutletContext, useNavigate } from "react-router-dom";
+
 import PageHeader from "components/PageHeader.component";
 import Table from "components/Table.component";
 
 import styles from "styles/user/filter/Filters.module.scss";
 
 function FiltersPage() {
+    const navigate = useNavigate();
+
+    const [user, setUser] = useOutletContext();
+
+    const [filters, setFilters] = useState([]);
+    
+    useEffect(() => {
+        (async () => {
+            let request, response;
+
+            request = await fetch('http://localhost:8080/api/filter/owned', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    auth: user.token,
+                },
+            });
+
+            if (request.status === 200) {
+                response = await request.json();
+
+                console.log(response);
+
+                
+                setFilters(
+                    response.map((filter) => {
+                        const date = new Date(filter.createdAt);
+                        const dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}.${date.getMinutes()}`;
+                        
+                        return [
+                            filter._id,
+                            filter.label,
+                            filter.fields.length,
+                            dateString,
+                        ]
+                    })
+                );
+            }
+        })();
+    }, [user.token]);
+
     return (
         <div className={styles.container}>
             <PageHeader
@@ -20,8 +64,25 @@ function FiltersPage() {
             <div className={styles.content}>
                 <Table
                     title="Manage filters"
-                    headers={["Filter", "Data count", "Last update"]}
+                    headers={["Filter", "Total fields", "Last update"]}
+                    items={filters}
                     colWidthPercent={["30%", "10%", "10%"]}
+                    actions={[
+                        {
+                            tooltip: "Edit",
+                            icon: "FaEdit",
+                            callback: (id) => {
+                                navigate('/user/filters/edit/', { replace: true, state: { id } });
+                            },
+                        },
+                        {
+                            tooltip: "Delete",
+                            icon: "FaTrash",
+                            callback: async (id) => {
+                                console.log(id);
+                            },
+                        },
+                    ]}
                 ></Table>
             </div>
         </div>

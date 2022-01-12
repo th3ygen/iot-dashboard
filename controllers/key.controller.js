@@ -32,7 +32,7 @@ module.exports = {
            
             const keys = (await Key.find({ ownerId: id})).map(key => ({
                 id: key._id,
-                pass: key.getKey(),
+                pass: `${key.ref}.${key.getKey()}`,
                 label: key.label,
                 createdAt: key.createdAt,
             }));
