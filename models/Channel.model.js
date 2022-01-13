@@ -36,6 +36,7 @@ const schema = new Schema(
 		ownerId: mongoose.Types.ObjectId,
 		uniqueId: String,
         visible: Boolean,
+		views: Number,
 	},
 	{ timestamps: true }
 );
@@ -258,6 +259,19 @@ schema.methods.updateKeys = async function (keys) {
 	await this.save();
 
 	return this;
+};
+
+schema.methods.addView = async function () {
+	if (!this.views) {
+		this.views = 0;
+	}
+
+	this.views++;
+
+	await this.save();
+
+	return this;
+
 };
 
 const Channel = mongoose.model("Channel", schema);

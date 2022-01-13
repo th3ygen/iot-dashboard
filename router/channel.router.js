@@ -27,4 +27,9 @@ router.get('/fields/data/:id', controller.channel.getFieldsData);
 router.post('/visibility/:id', middleware.jwt.verifyJWT, controller.channel.setVisibility);
 router.get('/visibility/:id', controller.channel.getVisibility);
 
+router.post('/like/:id', middleware.jwt.verifyJWT, controller.channel.like);
+router.get('/likes/:id', controller.channel.getTotalLikes);
+
+router.get('/view/:id', controller.channel.addView);
+
 module.exports = router;

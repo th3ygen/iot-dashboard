@@ -6,6 +6,7 @@ const pe = new PrettyError();
 
 const Channel = require('../models/channel.model');
 const Data = require('../models/data.model');
+const User = require('../models/user.model');
 
 module.exports = {
 	getOwned: async (req, res) => {
@@ -301,6 +302,89 @@ module.exports = {
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/assignFilters", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	addView: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			const channel = await Channel.findOne({ uniqueId: id });
+
+			
+			if (!channel) {
+				return res.status(404).json({
+					msg: 'channel not found'
+				});
+			}
+
+			await channel.addView();
+
+			res.status(200).json({
+				msg: 'view added'
+			});
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/addView", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	like: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			const channel = await Channel.findOne({ uniqueId: id });
+
+			if (!channel) {
+				return res.status(404).json({
+					msg: 'channel not found'
+				});
+			}
+
+			// check if user has already liked the channel
+			const user = await User.findById(req.payload.id);
+
+			if (user.likedChannels.includes(channel._id)) {
+				return res.status(402).json({
+					msg: 'user has already liked this channel'
+				});
+			}
+
+			await user.likeChannel(channel._id);
+
+			res.status(200).json({
+				msg: 'channel liked'
+			});
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/like", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	getTotalLikes: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			const channel = await Channel.findOne({ uniqueId: id });
+
+			// count all users with likedChannels.includes(id)
+			const count = await User.countDocuments({
+				likedChannels: {
+					$in: [channel._id]
+				}
+			});
+
+
+			res.status(200).json({
+				msg: 'total likes',
+				totalLikes: count
+			});
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/getTotalLikes", "red");
 			res.status(500).json({
 				msg: e,
 			});

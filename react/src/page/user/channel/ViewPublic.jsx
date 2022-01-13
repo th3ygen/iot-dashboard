@@ -1,14 +1,23 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
+import Tippy from "@tippyjs/react";
 
 import PageHeader from "components/PageHeader.component";
 import DateAxisLineChart from "components/DateAxisLineChart.component";
 import FolderCard from "components/FolderCard";
 
 import styles from "styles/user/channel/View.module.scss";
+import {
+	FaClock,
+	FaComment,
+	FaEye,
+	FaHeart,
+	FaPaperPlane,
+} from "react-icons/fa";
 
 function ViewChannel() {
 	const location = useLocation();
+	const [user, setUser] = useOutletContext();
 
 	const [channel, setChannel] = useState({});
 	const [data, setData] = useState([
@@ -65,8 +74,11 @@ function ViewChannel() {
 			value: 185,
 		},
 	]);
-	const [log, setLog] = useState([
-	]);
+	const [log, setLog] = useState([]);
+	const [likes, setLikes] = useState(0);
+	const [comments, setComments] = useState([]);
+	const [totalComments, setTotalComments] = useState(0);
+	const [totalViews, setTotalViews] = useState(0);
 
 	const logRef = useRef({});
 
@@ -76,20 +88,87 @@ function ViewChannel() {
 		}
 	}, [log]);
 
+	const like = async () => {
+		try {
+			let req;
+
+			if (user) {
+				req = await fetch(
+					"http://localhost:8080/api/channel/like/" +
+						location.state.id,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							auth: user.token,
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					setLikes(likes + 1);
+				}
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
 	useEffect(() => {
 		(async () => {
 			if (location.state.id) {
-				const request = await fetch(`http://localhost:8080/api/channel/public/${location.state.id}`, {
-					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				});
-	
-				if (request.status === 200) {
-					const response = await request.json();
-	
-					setChannel(response);
+				let req, res;
+				let tViews = 0;
+
+				req = await fetch(
+					`http://localhost:8080/api/channel/public/${location.state.id}`,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					tViews = res.views || 0;
+
+					setChannel(res);
+				}
+
+				req = await fetch(
+					"http://localhost:8080/api/channel/likes/" +
+						location.state.id,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					setLikes(res.totalLikes);
+				}
+
+				/* increment views */
+				req = await fetch(
+					"http://localhost:8080/api/channel/view/" +
+						location.state.id,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					setTotalViews(tViews + 1);
 				}
 			}
 		})();
@@ -102,15 +181,20 @@ function ViewChannel() {
 
 	const test = () => {
 		const now = new Date();
-		const nowStr = `${now.getDate()}/${now.getMonth() + 1} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-		setLog([...log, [`Device ${log.length}`, "text", nowStr, "somerandomdata123"]]);
+		const nowStr = `${now.getDate()}/${
+			now.getMonth() + 1
+		} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+		setLog([
+			...log,
+			[`Device ${log.length}`, "text", nowStr, "somerandomdata123"],
+		]);
 	};
 
 	return (
 		<div className="container">
 			<PageHeader
-				title={channel.title || 'Loading...'}
-				brief={channel.description || 'Loading...'}
+				title={channel.title || "Loading..."}
+				brief={channel.description || "Loading..."}
 				navs={[
 					{
 						name: "Browse channels",
@@ -125,7 +209,9 @@ function ViewChannel() {
 						<div className={styles.col}>
 							<div className={styles.item}>
 								<div className={styles.label}>Channel name</div>
-								<div className={styles.value}>{channel.title}</div>
+								<div className={styles.value}>
+									{channel.title}
+								</div>
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Owner</div>
@@ -135,7 +221,11 @@ function ViewChannel() {
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Total fields</div>
-								<div className={styles.value}>{(channel.fields && channel.fields.length) || 0}</div>
+								<div className={styles.value}>
+									{(channel.fields &&
+										channel.fields.length) ||
+										0}
+								</div>
 							</div>
 						</div>
 						<div className={styles.col}>
@@ -144,12 +234,61 @@ function ViewChannel() {
 								<div className={styles.value}>500</div>
 							</div>
 							<div className={styles.item}>
-								<div className={styles.label}>Ratings</div>
+								<div className={styles.label}>Views</div>
 								<div className={styles.value}>4.73</div>
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Likes</div>
 								<div className={styles.value}>32</div>
+							</div>
+						</div>
+						<div className={styles.row}>
+							<div className={styles.actions}>
+								<Tippy
+									content="Views"
+									delay={[500, 0]}
+									duration={[100, 100]}
+									animation="scale"
+									inertia="true"
+								>
+									<div className={`neon-btn ${styles.stat}`}>
+										<FaEye />
+										<div className={styles.value}>
+											{totalViews}
+										</div>
+									</div>
+								</Tippy>
+								<Tippy
+									content="Likes"
+									delay={[500, 0]}
+									duration={[100, 100]}
+									animation="scale"
+									inertia="true"
+								>
+									<div
+										className={`neon-btn ${styles.stat}`}
+										onClick={like}
+									>
+										<FaHeart />
+										<div className={styles.value}>
+											{likes}
+										</div>
+									</div>
+								</Tippy>
+								<Tippy
+									content="Comments"
+									delay={[500, 0]}
+									duration={[100, 100]}
+									animation="scale"
+									inertia="true"
+								>
+									<div className={`neon-btn ${styles.stat}`}>
+										<FaComment />
+										<div className={styles.value}>
+											{totalComments}
+										</div>
+									</div>
+								</Tippy>
 							</div>
 						</div>
 					</div>
@@ -188,6 +327,40 @@ function ViewChannel() {
 						</div>
 					</div>
 				</FolderCard>
+
+				<div className={styles.comments}>
+					<div className={styles.list}>
+						{comments.map((item, index) => (
+							<div className={styles.comment}>
+								<div className={styles.user}>
+									<div className={styles.avatar}></div>
+									<div className={styles.name}>Aidilsyaz</div>
+								</div>
+								<div className={styles.content}>
+									Lorem ipsum dolor sit amet consectetur,
+									adipisicing elit. Provident, repellendus.
+								</div>
+								<div className={styles.date}>
+									<FaClock style={{ color: "#2179ff" }} />
+									12/12/1212
+								</div>
+							</div>
+						))}
+					</div>
+
+					<div className={styles.input}>
+						<div className={styles.label}>Write something...</div>
+						<div className={styles.inputField}>
+							<textarea></textarea>
+						</div>
+						<div className={styles.buttons}>
+							<div className="neon-btn">
+								<FaPaperPlane />
+								Comment
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

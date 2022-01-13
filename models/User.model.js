@@ -19,12 +19,25 @@ const schema = new Schema(
       index: true,
     },
 
+    likedChannels: [mongoose.Schema.Types.ObjectId],
+
     hash: String,
     salt: Number,
     avatar: String,
   },
   { timestamps: true }
 );
+
+schema.methods.likeChannel = async function(channelId) {
+  const user = this;
+
+  if (user.likedChannels.includes(channelId)) {
+    return;
+  }
+
+  user.likedChannels.push(channelId);
+  await user.save();
+}
 
 const User = mongoose.model("User", schema);
 
