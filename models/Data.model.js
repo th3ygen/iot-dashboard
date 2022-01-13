@@ -6,8 +6,8 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     fieldName: String,
+    channelId: String,
     value: Number,
-    channelId: String
 }, { timestamps: true });
 
 schema.statics.push = async (fieldName, value, channelId) => {

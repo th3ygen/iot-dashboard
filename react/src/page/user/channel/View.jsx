@@ -1,13 +1,28 @@
+import { useLocation, useOutletContext } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { useSubscription, useMqttState } from "mqtt-react-hooks";
 
 import PageHeader from "components/PageHeader.component";
 import DateAxisLineChart from "components/DateAxisLineChart.component";
 import FolderCard from "components/FolderCard";
 
 import styles from "styles/user/channel/View.module.scss";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function ViewChannel() {
-	const [data, setData] = useState([
+	const location = useLocation();
+	const [user, setUser] = useOutletContext();
+	const { message, connectionStatus } = useSubscription(
+		"iot-dash/+/+/update"
+	);
+
+	const [fields, setFields] = useState([]);
+	const [data, setData] = useState({});
+	const [log, setLog] = useState([]);
+	const [id, setId] = useState("");
+	const [visibile, setVisible] = useState(false);
+
+	const dt = [
 		{
 			date: new Date(2021, 0, 1).getTime(),
 			value: 100,
@@ -60,11 +75,73 @@ function ViewChannel() {
 			date: new Date(2021, 0, 13).getTime(),
 			value: 185,
 		},
-	]);
-	const [log, setLog] = useState([
-	]);
+	];
 
 	const logRef = useRef({});
+
+	const test = () => {
+		const now = new Date();
+		const nowStr = `${now.getDate()}/${
+			now.getMonth() + 1
+		} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+		setLog([
+			...log,
+			[`Device ${log.length}`, "text", nowStr, "somerandomdata123"],
+		]);
+	};
+
+	const toggleVisibility = async () => {
+		try {
+			let res, req;
+
+			req = await fetch(
+				"http://localhost:8080/api/channel/visibility/" +
+					location.state.id,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						auth: user.token,
+					},
+					body: JSON.stringify({
+						flag: !visibile,
+					}),
+				}
+			);
+
+				console.log(req);
+
+			if (req.status === 200) {
+				setVisible(!visibile);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	useEffect(() => {
+		try {
+			if (connectionStatus === "Connected" && id !== "") {
+				if (message) {
+					const topic = message.topic.split("/");
+					const body = JSON.parse(message.message);
+
+					if (topic[1] === id) {
+						const newData = { ...data };
+						if (newData[topic[2]]) {
+							newData[topic[2]].push(body);
+						} else {
+							newData[topic[2]] = [body];
+						}
+
+						setData(newData);
+					}
+				}
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}, [message, connectionStatus, id]);
 
 	useEffect(() => {
 		if (logRef.current) {
@@ -77,11 +154,45 @@ function ViewChannel() {
 		window.scrollTo(0, 0);
 	}, []);
 
-	const test = () => {
-		const now = new Date();
-		const nowStr = `${now.getDate()}/${now.getMonth() + 1} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-		setLog([...log, [`Device ${log.length}`, "text", nowStr, "somerandomdata123"]]);
-	};
+	useEffect(() => {
+		(async () => {
+			if (location.state.id) {
+				let req, res;
+
+				req = await fetch(
+					"http://localhost:8080/api/channel/fields/data/" +
+						location.state.id,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					setId(res.id);
+					setData(res.data);
+					setFields(Object.keys(res.data));
+				}
+
+				req = await fetch('http://localhost:8080/api/channel/visibility/' + location.state.id, {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					setVisible(res.flag);
+				}
+			}
+		})();
+	}, [location.state.id]);
 
 	return (
 		<div className="container">
@@ -129,16 +240,43 @@ function ViewChannel() {
 								<div className={styles.value}>32</div>
 							</div>
 						</div>
+						<div className={styles.row}>
+							<div className={styles.actions}>
+								{(visibile && (
+									<div
+										className="neon-btn"
+										onClick={toggleVisibility}
+									>
+										<FaEyeSlash />
+										Hide channel
+									</div>
+								)) || (
+									<div
+										className="neon-btn"
+										onClick={toggleVisibility}
+									>
+										<FaEye />
+										Unhide channel
+									</div>
+								)}
+							</div>
+						</div>
 					</div>
 				</FolderCard>
 
-				<DateAxisLineChart
-					title="Field: number"
-					data={data}
-					label="Profit"
-					height="250px"
-					stepped={true}
-				/>
+				<div className={styles.fields}>
+					{fields.map((field, index) => (
+						<div key={index}>
+							<DateAxisLineChart
+								title={field}
+								label={`${field}${index}`}
+								data={data[field]}
+								height="250px"
+								stepped={false}
+							/>
+						</div>
+					))}
+				</div>
 
 				<FolderCard title="Live update">
 					<div className={styles.log}>

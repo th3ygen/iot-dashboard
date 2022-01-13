@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Connector } from "mqtt-react-hooks";
 import logo from "./logo.svg";
 import "styles/App.module.scss";
 
@@ -75,62 +76,64 @@ function Home() {
 
 function App() {
 	return (
-		<div className="App">
-			<Routes>
-				<Route path="/user" element={<UserLayout />}>
-					<Route index element={<Home />} />
-					{/* User -> Data */}
-					<Route path="/user/browse" element={<BrowseDataPage />} />
-					{/* User -> Channels */}
-					<Route path="/user/channels" element={<ChannelPage />} />
-					<Route
-						path="/user/channels/add"
-						element={<AddChannelPage />}
-					/>
-					<Route
-						path="/user/channels/edit"
-						element={<EditChannelPage />}
-					/>
-					<Route path="/user/channels/view" element={<ViewChannelPage />} />
-					<Route path="/user/channels/view/public" element={<ViewPublicChannelPage />} />
-					<Route path="/user/channels/key" element={<ChannelKeysPage />} />
-					<Route path="/user/channels/filters" element={<ChannelFiltersPage />} />
-					{/* User -> Webhooks */}
-					<Route path="/user/webhooks/add" element={<AddWebhookPage />} />
-					<Route path="/user/webhooks" element={<WebhooksPage />} />
-					{/* User -> Devices */}
-					<Route path="/user/devices" element={<DevicesPage />} />
-					<Route path="/user/devices/add" element={<AddDevicePage />} />
-					{/* User -> ApiKeys */}
-					<Route path="/user/apiKeys" element={<ApiKeysPage />} />
-					<Route path="/user/apiKeys/add" element={<AddApiKeyPage />} />
-					{/* User -> Filters */}
-					<Route path="/user/filters" element={<FiltersPage />} />
-					<Route path="/user/filters/add" element={<AddFilterPage />} />
-					<Route path="/user/filters/edit" element={<EditFilterPage />} />
-					{/* <Route path="inventory" element={<ManageInventoryPage />} />
-					<Route path="/user/inventory/add" element={<InventoryAddItemPage />} />
-					<Route path="/user/inventory/edit" element={<InventoryEditItemPage />} />
-					<Route path="/user/inventory/sell" element={<InventoryAddSoldPage />} />
+		<Connector brokerUrl="ws://localhost:9001" options={{ keepalive: 0 }} >
+			<div className="App">
+				<Routes>
+					<Route path="/user" element={<UserLayout />}>
+						<Route index element={<Home />} />
+						{/* User -> Data */}
+						<Route path="/user/browse" element={<BrowseDataPage />} />
+						{/* User -> Channels */}
+						<Route path="/user/channels" element={<ChannelPage />} />
+						<Route
+							path="/user/channels/add"
+							element={<AddChannelPage />}
+						/>
+						<Route
+							path="/user/channels/edit"
+							element={<EditChannelPage />}
+						/>
+						<Route path="/user/channels/view" element={<ViewChannelPage />} />
+						<Route path="/user/channels/view/public" element={<ViewPublicChannelPage />} />
+						<Route path="/user/channels/key" element={<ChannelKeysPage />} />
+						<Route path="/user/channels/filters" element={<ChannelFiltersPage />} />
+						{/* User -> Webhooks */}
+						<Route path="/user/webhooks/add" element={<AddWebhookPage />} />
+						<Route path="/user/webhooks" element={<WebhooksPage />} />
+						{/* User -> Devices */}
+						<Route path="/user/devices" element={<DevicesPage />} />
+						<Route path="/user/devices/add" element={<AddDevicePage />} />
+						{/* User -> ApiKeys */}
+						<Route path="/user/apiKeys" element={<ApiKeysPage />} />
+						<Route path="/user/apiKeys/add" element={<AddApiKeyPage />} />
+						{/* User -> Filters */}
+						<Route path="/user/filters" element={<FiltersPage />} />
+						<Route path="/user/filters/add" element={<AddFilterPage />} />
+						<Route path="/user/filters/edit" element={<EditFilterPage />} />
+						{/* <Route path="inventory" element={<ManageInventoryPage />} />
+						<Route path="/user/inventory/add" element={<InventoryAddItemPage />} />
+						<Route path="/user/inventory/edit" element={<InventoryEditItemPage />} />
+						<Route path="/user/inventory/sell" element={<InventoryAddSoldPage />} />
 
-					<Route path="orders" element={<ManageOrderPage />} />
-					<Route path="report" element={<DisplayReportPage />} />
-					<Route path="accounts" element={<ManageAccountPage />} />
-					<Route path="approve" element={<ApproveOrderPage />} />
-					<Route path="add" element={<AddOrderPage />} />
-					<Route path="update" element={<UpdateOrderPage />} /> */}
-					{/* <Route path="tests" element={<TestPage />} /> */}
-				</Route>
-				{/* <Route path="/admin" element={<AdminLayout />}>
-					<Route index element={<Home />} />
-					<Route path="accounts" element={<ManageAccountPage />} />
-					<Route path="/admin/accounts/add_account" element={<AddAccountPage />} />
-					<Route path="/admin/accounts/update_account" element={<UpdateAccountPage />} />
-					<Route path="report" element={<DisplayReportPage />} />
-					<Route path="inventory" element={<ManageInventoryPage />} />
-				</Route> */}
-			</Routes>
-		</div>
+						<Route path="orders" element={<ManageOrderPage />} />
+						<Route path="report" element={<DisplayReportPage />} />
+						<Route path="accounts" element={<ManageAccountPage />} />
+						<Route path="approve" element={<ApproveOrderPage />} />
+						<Route path="add" element={<AddOrderPage />} />
+						<Route path="update" element={<UpdateOrderPage />} /> */}
+						{/* <Route path="tests" element={<TestPage />} /> */}
+					</Route>
+					{/* <Route path="/admin" element={<AdminLayout />}>
+						<Route index element={<Home />} />
+						<Route path="accounts" element={<ManageAccountPage />} />
+						<Route path="/admin/accounts/add_account" element={<AddAccountPage />} />
+						<Route path="/admin/accounts/update_account" element={<UpdateAccountPage />} />
+						<Route path="report" element={<DisplayReportPage />} />
+						<Route path="inventory" element={<ManageInventoryPage />} />
+					</Route> */}
+				</Routes>
+			</div>
+		</Connector>
 	);
 }
 

@@ -13,7 +13,7 @@ function LineChart({ ...props }) {
 	const ch = useRef(null);
 
 	useLayoutEffect(() => {
-		let root = am5.Root.new("chartdiv");
+		let root = am5.Root.new(props.label);
 
 		root.setThemes([am5themes_Animated.new(root)]);
 
@@ -35,12 +35,12 @@ function LineChart({ ...props }) {
 		// Create X-Axis
 		let xAxis = chart.xAxes.push(
 			am5xy.DateAxis.new(root, {
-				baseInterval: { timeUnit: "day", count: 1 },
+				baseInterval: { timeUnit: "second", count: 1 },
 				renderer: am5xy.AxisRendererX.new(root, {}),
 			})
 		);
 
-		xAxis.get("dateFormats")["day"] = "MM/dd";
+		xAxis.get("dateFormats")["second"] = "HH:mm";
 		xAxis.get("periodChangeDateFormats")["day"] = "MMMM";
 
 		// Create series
@@ -60,9 +60,8 @@ function LineChart({ ...props }) {
 			series.bullets.push(function () {
 				return am5.Bullet.new(root, {
 					sprite: am5.Circle.new(root, {
-						radius: 5,
+						radius: 4,
 						fill: series.get("fill"),
-						stroke: am5.color("#FFF"),
 					}),
 				});
 			});
@@ -119,7 +118,12 @@ function LineChart({ ...props }) {
 
 	// update data on props change
 	useEffect(() => {
-		ch.current.data.setAll(props.data);
+		let data = props.data;
+		if (data.length > 15) {
+			// set props.data to latest 15
+			data = data.slice(data.length - 15);
+		}
+		ch.current.data.setAll(data);
 	}, [props.data, props.data.length]);
 
 	return (
@@ -127,7 +131,7 @@ function LineChart({ ...props }) {
 			<div className={styles.body}>
 				<div className={styles.chart}>
 					<div
-						id="chartdiv"
+						id={props.label}
 						style={{ width: "100%", height: props.height }}
 					></div>
 				</div>

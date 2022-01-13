@@ -5,8 +5,22 @@
 	gap: 40px;
 }
 
+.fields {
+	display: flex;
+
+	flex-direction: column;
+
+	gap: 40px;
+}
+
 .info {
 	display: flex;
+
+	flex-wrap: wrap;
+
+	.row {
+		flex: 0 0 100%;
+	}
 
 	.col {
 		flex: 1 1 50%;
@@ -40,6 +54,12 @@
 				font-size: 14px;
 			}
 		}
+	}
+
+	.actions {
+		display: flex;
+
+		justify-content: flex-end;
 	}
 }
 

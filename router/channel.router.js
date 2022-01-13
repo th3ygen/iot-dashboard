@@ -23,5 +23,8 @@ router.delete('/delete/:id', middleware.jwt.verifyJWT, controller.channel.delete
 
 router.post('/assignFilters', middleware.jwt.verifyJWT, controller.channel.assignFilters);
 
+router.get('/fields/data/:id', controller.channel.getFieldsData);
+router.post('/visibility/:id', middleware.jwt.verifyJWT, controller.channel.setVisibility);
+router.get('/visibility/:id', controller.channel.getVisibility);
 
 module.exports = router;

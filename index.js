@@ -12,23 +12,15 @@ const pe = new PrettyError();
 
 (async () => {
 	try {
-        const app = express();
-        /* const server = require('https').createServer({
+		const app = express();
+		/* const server = require('https').createServer({
             cert: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.crt`)),
             key: fs.readFileSync(path.join(__dirname, 'cert', `${process.env.HOSTNAME}.key`))
         }, app); */
 
-        app.use(cors());
-        app.use(express.urlencoded({ extended: false }));
-        app.use(express.json());
-
-		helper.log(
-			`connecting to broker, url: ${process.env.MQTT_URL} port: ${process.env.MQTT_PORT}`,
-			"mqtt",
-			"green"
-		);
-		await require("./services/mqtt.service").connect();
-		helper.log("connected", "mqtt", "green");
+		app.use(cors());
+		app.use(express.urlencoded({ extended: false }));
+		app.use(express.json());
 
 		helper.log(
 			`connecting to MongoDB server, url: ${process.env.DB_URL}`,
@@ -40,6 +32,13 @@ const pe = new PrettyError();
 
 		require("./models");
 
+		helper.log(
+			`connecting to broker, url: ${process.env.MQTT_URL} port: ${process.env.MQTT_PORT}`,
+			"mqtt",
+			"green"
+		);
+		await require("./services/mqtt.service").connect();
+		helper.log("connected", "mqtt", "green");
 		app.use("/api", require("./router"));
 
 		app.listen(process.env.PORT, () => {
@@ -50,7 +49,7 @@ const pe = new PrettyError();
 			);
 		});
 	} catch (e) {
-        helper.log(pe.render(e), e.label, "red");
+		helper.log(pe.render(e), e.label, "red");
 		helper.log("Aborted, Ctrl+C to end the process", "server", "red");
 
 		return;

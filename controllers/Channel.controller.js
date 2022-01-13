@@ -5,6 +5,7 @@ const PrettyError = require("pretty-error");
 const pe = new PrettyError();
 
 const Channel = require('../models/channel.model');
+const Data = require('../models/data.model');
 
 module.exports = {
 	getOwned: async (req, res) => {
@@ -16,6 +17,32 @@ module.exports = {
 			});
 		} catch (e) {
 			helper.log(pe.render(e), "ROUTE: /api/channel/getOwned", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	setVisibility: async (req, res) => {
+		try {
+			const channel = await Channel.setVisibility(req.params.id, req.body.flag);
+
+			return res.status(200).json(channel);
+		} catch (e) {
+			helper.log(pe.render(e), "ROUTE: /api/channel/setVisibility", "red");
+			res.status(500).json({	
+				msg: e,
+			});
+		}
+	},
+	getVisibility: async (req, res) => {
+		try {
+			const flag = await Channel.getVisibility(req.params.id);
+
+			return res.status(200).json({
+				flag
+			});
+		} catch (e) {
+			helper.log(pe.render(e), "ROUTE: /api/channel/getVisibility", "red");
 			res.status(500).json({
 				msg: e,
 			});
@@ -35,7 +62,8 @@ module.exports = {
 	},
 	getAllPublic: async (req, res) => {
 		try {
-			const channels = await Channel.find({});
+			// find only visible channels
+			const channels = await Channel.find({ visible: true });
 
 			return res.status(200).json(channels.map(channel => ({
 				id: channel.uniqueId,
@@ -64,6 +92,43 @@ module.exports = {
 			});
 		} catch (e) {
 			helper.log(pe.render(e), "ROUTE: /api/channel/getById", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	getFieldsData: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			const channel = await Channel.findById(id);
+
+			const data = {};
+
+			for (let field of channel.fields) {
+				// get last 15 data
+				const lastData = await Data.find({
+					channelId: id,
+					fieldName: field.label,
+				}).sort({
+					createdAt: -1
+				}).limit(15);
+
+				data[field.label] = lastData.map(d => ({
+					value: d.value,
+					date: new Date(d.createdAt).getTime(),
+				}));
+				data[field.label].sort((a, b) => a.date - b.date);
+
+			}
+
+			return res.status(200).json({
+				id: channel.uniqueId,
+				data
+			});
+
+		} catch (e) {
+			helper.log(pe.render(e), "ROUTE: /api/channel/getFieldsData", "red");
 			res.status(500).json({
 				msg: e,
 			});
@@ -105,6 +170,7 @@ module.exports = {
 					{
 						label: field.label,
 						dataType: field.dataType,
+						filterId: field.filterId || null,
 					}
 				))
 			});

@@ -41,10 +41,18 @@ schema.statics.verify = async pass => {
         const ref = pass.split('.')[0];
         const key = await Key.findOne({ ref });
 
+        if (!key) {
+            return false;
+        }
+
         const p1 = pass.split('.')[1];
         const p2 = CryptoJS.Rabbit.decrypt(key.pass, process.env.API_KEY_SECRET).toString(CryptoJS.enc.Utf8);
 
-        return (p1 === p2);
+        if (p1 === p2) {
+            return key._id;
+        }
+
+        return false;
     } catch (e) {
         _helper.log(`Unable to verify key: ${e.message}`, 'error', 'red');
         return false;
