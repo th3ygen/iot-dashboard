@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useLocation } from "react-router-dom";
 import PageHeader from "components/PageHeader.component";
 import { FaPlus } from "react-icons/fa";
 
@@ -8,6 +8,7 @@ import styles from "styles/user/webhook/AddWebhook.module.scss";
 function AddWebhookPage() {
 	const [user, setUser] = useOutletContext();
 
+	const location = useLocation();
 	const navigate = useNavigate();
 
     const [channels, setChannels] = useState([]);
@@ -21,12 +22,12 @@ function AddWebhookPage() {
 	const triggerCompareRef = useRef();
 	const triggerValueRef = useRef();
 
-	const addWebhook = async () => {
+	const updateWebhook = async () => {
 		try {
 			let res, req;
 
-			res = await fetch("http://localhost:8080/api/webhook/create", {
-				method: "POST",
+			res = await fetch("http://localhost:8080/api/webhook/update/"+location.state.id, {
+				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
 					auth: user.token,
@@ -34,7 +35,7 @@ function AddWebhookPage() {
 				body: JSON.stringify({
 					label: labelRef.current.value,
 					url: urlRef.current.value,
-                    channelId: channelRef.current.value,
+					channelId: channelRef.current.value,
 					payload: payloadRef.current.value,
 					trigger: `${triggerFieldRef.current.value} ${triggerCompareRef.current.value} ${triggerValueRef.current.value}`,
 				}),
@@ -87,11 +88,44 @@ function AddWebhookPage() {
 		})();
 	}, [user.token]);
 
+	useEffect(() => {
+		(async () => {
+			if (location.state.id) {
+				try {
+					let res, req;
+
+					req = await fetch(`http://localhost:8080/api/webhook/get/${location.state.id}`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							auth: user.token,
+						},
+					});
+
+					if (req.status === 200) {
+						res = await req.json();
+
+						labelRef.current.value = res.label;
+						urlRef.current.value = res.url;
+						channelRef.current.value = res.channelId;
+						payloadRef.current.value = res.payload;
+						triggerFieldRef.current.value = res.trigger.split(" ")[0];
+						triggerCompareRef.current.value = res.trigger.split(" ")[1];
+						triggerValueRef.current.value = res.trigger.split(" ")[2];
+					}
+				} catch (e) {
+					console.error(e);
+				}
+			}
+
+		})();
+	}, [location.state.id]);
+
 	return (
 		<div className={styles.container}>
 			<PageHeader
-				title="Add webhook"
-				brief="Create a new webhook for integration purposes"
+				title="Edit webhook"
+				brief="Edit your webhook anytime you want"
 				navs={[
 					{
 						name: "Webhooks",
@@ -160,7 +194,7 @@ function AddWebhookPage() {
 						</div>
 					</div>
 					<div className={`${styles.item} ${styles.addBtn}`}>
-						<div className="neon-btn" onClick={addWebhook}>
+						<div className="neon-btn" onClick={updateWebhook}>
 							<FaPlus /> <span>Add webhook</span>
 						</div>
 					</div>

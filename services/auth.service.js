@@ -44,6 +44,34 @@ const login = (username, password) => (
 const register = (username, password, email) => (
     new Promise(async (resolve, reject) => {
         try {
+            // username must be unique
+            let user = await User.findOne({ username });
+
+            if (user) {
+                return reject({
+                    label: `register from {u:${username}, p:${password}, e:${email}}`,
+                    msg: 'username already exists',
+                    payload: {
+                        username,
+                        email,
+                        password,
+                    },
+                });
+            }
+
+            // username must have atleast 4 characters
+            if (username.length < 4) {
+                return reject({
+                    label: `register from {u:${username}, p:${password}, e:${email}}`,
+                    msg: 'username must have atleast 4 characters',
+                    payload: {
+                        username,
+                        email,
+                        password,
+                    },
+                });
+            }
+
             if (!validator.isEmail(email)) {
                 return reject({
                     label: 'register',
@@ -80,7 +108,7 @@ const register = (username, password, email) => (
 
             const hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALTROUNDS));
 
-            const user = new User({
+            user = new User({
                 username, hash, email
             });
 

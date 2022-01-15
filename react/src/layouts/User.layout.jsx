@@ -31,11 +31,11 @@ export default function UserLayout(props) {
 			name: "Filters",
 			icon: "FaFilter",
 		},
-		{
+		/* {
 			path: "/user/devices",
 			name: "Devices",
 			icon: "FaToolbox",
-		},
+		}, */
 		{
 			path: "/user/apikeys",
 			name: "API Keys",
@@ -75,7 +75,7 @@ export default function UserLayout(props) {
 	return (
 		<div>
 			<Topbar />
-			<Navbar paths={paths} />
+			<Navbar paths={paths} username={"edel"} title={"User"}/>
 			<div className={styles.content}>
 				<Outlet context={[user, setUser]}/>
 			</div>

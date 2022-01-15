@@ -149,8 +149,6 @@ function ViewChannel() {
 				if (req.status === 200) {
 					res = await req.json();
 
-					console.log("channel", res);
-
 					tViews = res.views || 0;
 
 					ownerId = res.ownerId;
@@ -203,9 +201,6 @@ function ViewChannel() {
 
 				if (req.status === 200) {
 					res = await req.json();
-
-					console.log(res);
-
 					setTotalComments(res.length);
 					setComments(
 						res.map((c) => {
