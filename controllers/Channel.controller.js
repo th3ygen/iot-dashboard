@@ -4,9 +4,10 @@ const PrettyError = require("pretty-error");
 
 const pe = new PrettyError();
 
-const Channel = require('../models/channel.model');
-const Data = require('../models/data.model');
-const User = require('../models/user.model');
+const Channel = require("../models/channel.model");
+const Data = require("../models/data.model");
+const User = require("../models/user.model");
+const Comment = require("../models/Comment.model");
 
 module.exports = {
 	getOwned: async (req, res) => {
@@ -14,7 +15,7 @@ module.exports = {
 			const channels = await Channel.find({ ownerId: req.payload.id });
 
 			return res.status(200).json({
-				channels
+				channels,
 			});
 		} catch (e) {
 			helper.log(pe.render(e), "ROUTE: /api/channel/getOwned", "red");
@@ -25,12 +26,19 @@ module.exports = {
 	},
 	setVisibility: async (req, res) => {
 		try {
-			const channel = await Channel.setVisibility(req.params.id, req.body.flag);
+			const channel = await Channel.setVisibility(
+				req.params.id,
+				req.body.flag
+			);
 
 			return res.status(200).json(channel);
 		} catch (e) {
-			helper.log(pe.render(e), "ROUTE: /api/channel/setVisibility", "red");
-			res.status(500).json({	
+			helper.log(
+				pe.render(e),
+				"ROUTE: /api/channel/setVisibility",
+				"red"
+			);
+			res.status(500).json({
 				msg: e,
 			});
 		}
@@ -40,10 +48,14 @@ module.exports = {
 			const flag = await Channel.getVisibility(req.params.id);
 
 			return res.status(200).json({
-				flag
+				flag,
 			});
 		} catch (e) {
-			helper.log(pe.render(e), "ROUTE: /api/channel/getVisibility", "red");
+			helper.log(
+				pe.render(e),
+				"ROUTE: /api/channel/getVisibility",
+				"red"
+			);
 			res.status(500).json({
 				msg: e,
 			});
@@ -51,9 +63,76 @@ module.exports = {
 	},
 	getPublic: async (req, res) => {
 		try {
-			const channel = await Channel.findOne({ uniqueId: req.params.id });
+			// get channel by id
+			// with the owner username
+			// using aggregation
 
-			return res.status(200).json(channel);
+			let channel;
+
+			// check id is object id
+			if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+				channel = await Channel.aggregate([
+					{
+						$match: {
+							uniqueId: req.params.id,
+						},
+					},
+					{
+						$lookup: {
+							from: "users",
+							localField: "ownerId",
+							foreignField: "_id",
+
+							as: "owner",
+						},
+					},
+					{
+						$unwind: "$owner",
+					},
+				]).limit(1);
+			} else {
+				channel = await Channel.aggregate([
+					{
+						$match: {
+							_id: mongoose.Types.ObjectId(req.params.id),
+						},
+					},
+					{
+						$lookup: {
+							from: "users",
+							localField: "ownerId",
+							foreignField: "_id",
+
+							as: "owner",
+						},
+					},
+					{
+						$unwind: "$owner",
+					},
+				]).limit(1);
+			}
+
+			if (!channel[0]) {
+				return res.status(404).json({
+					msg: "channel not found",
+				});
+			}
+
+			// count total data added in 1 day
+			const data = await Data.find({
+				channelId: channel[0]._id,
+				createdAt: {
+					$gte: new Date(
+						new Date().setDate(
+							new Date().getDate() - 1000 * 60 * 60 * 24
+						)
+					),
+				},
+			});
+
+			channel[0].dataPerDay = data.length;
+
+			return res.status(200).json(channel[0]);
 		} catch (e) {
 			helper.log(pe.render(e), "ROUTE: /api/channel/getPublic", "red");
 			res.status(500).json({
@@ -66,15 +145,31 @@ module.exports = {
 			// find only visible channels
 			const channels = await Channel.find({ visible: true });
 
-			return res.status(200).json(channels.map(channel => ({
-				id: channel.uniqueId,
-				title: channel.title,
-				description: channel.description,
-				image: channel.image,
-				views: 0,
-				likes: 0,
-				comments: 0
-			})));
+			const o = [];
+
+			for (let channel of channels) {
+				const totalComments = await Comment.countDocuments({
+					channelId: channel._id,
+				});
+
+				const totalLikes = await User.countDocuments({
+					likedChannels: {
+						$in: [channel._id],
+					},
+				});
+
+				o.push({
+					id: channel.uniqueId,
+					title: channel.title,
+					description: channel.description,
+					image: channel.image,
+					views: channel.views,
+					likes: totalLikes,
+					comments: totalComments,
+				});
+			}
+
+			return res.status(200).json(o);
 		} catch (e) {
 			helper.log(pe.render(e), "ROUTE: /api/channel/getAllPublic", "red");
 			res.status(500).json({
@@ -89,7 +184,7 @@ module.exports = {
 			const channel = await Channel.findById(id);
 
 			return res.status(200).json({
-				channel
+				channel,
 			});
 		} catch (e) {
 			helper.log(pe.render(e), "ROUTE: /api/channel/getById", "red");
@@ -102,34 +197,57 @@ module.exports = {
 		try {
 			const { id } = req.params;
 
-			const channel = await Channel.findById(id);
+			let channel;
+
+			// check if id is a channel id
+			if (mongoose.Types.ObjectId.isValid(id)) {
+				channel = await Channel.findById(id);
+			} else {
+				channel = await Channel.findOne({ uniqueId: id });
+			}
+
+			if (!channel) {
+				return res.status(404).json({
+					msg: "Channel not found",
+				});
+			}
 
 			const data = {};
 
 			for (let field of channel.fields) {
 				// get last 15 data
+				// for the current day
 				const lastData = await Data.find({
-					channelId: id,
+					channelId: channel._id,
 					fieldName: field.label,
-				}).sort({
-					createdAt: -1
-				}).limit(15);
+					createdAt: {
+						$gte: new Date(
+							new Date().setDate(new Date().getDate() - 1)
+						),
+					},
+				})
+					.sort({
+						createdAt: -1,
+					})
+					.limit(15);
 
-				data[field.label] = lastData.map(d => ({
+				data[field.label] = lastData.map((d) => ({
 					value: d.value,
 					date: new Date(d.createdAt).getTime(),
 				}));
 				data[field.label].sort((a, b) => a.date - b.date);
-
 			}
 
 			return res.status(200).json({
 				id: channel.uniqueId,
-				data
+				data,
 			});
-
 		} catch (e) {
-			helper.log(pe.render(e), "ROUTE: /api/channel/getFieldsData", "red");
+			helper.log(
+				pe.render(e),
+				"ROUTE: /api/channel/getFieldsData",
+				"red"
+			);
 			res.status(500).json({
 				msg: e,
 			});
@@ -138,7 +256,7 @@ module.exports = {
 	create: async (req, res) => {
 		try {
 			const { title, description, fields } = req.body;
-			
+
 			/* // validate id
 			const isValid = await Channel.isIdUnique(id);
 			
@@ -148,10 +266,15 @@ module.exports = {
 				});
 			} */
 
-			const channel = await Channel.add(title, description, fields, req.payload.id);
+			const channel = await Channel.add(
+				title,
+				description,
+				fields,
+				req.payload.id
+			);
 
 			res.status(200).json({
-				channel
+				channel,
 			});
 		} catch (e) {
 			helper.log(e.stack, "ROUTE: /api/channel/create", "red");
@@ -167,13 +290,11 @@ module.exports = {
 			const channel = await Channel.findByIdAndUpdate(req.params.id, {
 				title,
 				description,
-				fields: fields.map(field => (
-					{
-						label: field.label,
-						dataType: field.dataType,
-						filterId: field.filterId || null,
-					}
-				))
+				fields: fields.map((field) => ({
+					label: field.label,
+					dataType: field.dataType,
+					filterId: field.filterId || null,
+				})),
 			});
 
 			return res.status(200).json(channel);
@@ -192,14 +313,14 @@ module.exports = {
 
 			if (isValid) {
 				return res.status(200).json({
-					msg: 'valid',
-					id
+					msg: "valid",
+					id,
 				});
 			}
 
 			res.status(402).json({
-				msg: 'invalid',
-				id
+				msg: "invalid",
+				id,
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/validateid", "red");
@@ -216,20 +337,20 @@ module.exports = {
 
 			if (!channel) {
 				return res.status(404).json({
-					msg: 'channel not found'
+					msg: "channel not found",
 				});
 			}
 
-			if (typeof label !== 'string') {
+			if (typeof label !== "string") {
 				return res.status(404).json({
-					msg: 'label must be string'
+					msg: "label must be string",
 				});
 			}
 
 			await channel.addField(label);
 
 			res.status(200).json({
-				msg: `field ${label} added`
+				msg: `field ${label} added`,
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/addfield", "red");
@@ -246,7 +367,7 @@ module.exports = {
 
 			if (!channel) {
 				return res.status(404).json({
-					msg: 'channel not found'
+					msg: "channel not found",
 				});
 			}
 
@@ -258,7 +379,7 @@ module.exports = {
 			await channel.updateKeys(keys);
 
 			res.status(200).json({
-				msg: `keys added`
+				msg: `keys added`,
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/updateKey", "red");
@@ -275,14 +396,14 @@ module.exports = {
 
 			if (!channel) {
 				return res.status(404).json({
-					msg: 'channel not found'
+					msg: "channel not found",
 				});
 			}
 
 			await channel.delete();
 
 			res.status(200).json({
-				msg: 'channel deleted'
+				msg: "channel deleted",
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/delete", "red");
@@ -298,7 +419,7 @@ module.exports = {
 			await Channel.assignFilters(id, filters);
 
 			res.status(200).json({
-				msg: 'filters assigned'
+				msg: "filters assigned",
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/assignFilters", "red");
@@ -313,17 +434,16 @@ module.exports = {
 
 			const channel = await Channel.findOne({ uniqueId: id });
 
-			
 			if (!channel) {
 				return res.status(404).json({
-					msg: 'channel not found'
+					msg: "channel not found",
 				});
 			}
 
 			await channel.addView();
 
 			res.status(200).json({
-				msg: 'view added'
+				msg: "view added",
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/addView", "red");
@@ -340,7 +460,7 @@ module.exports = {
 
 			if (!channel) {
 				return res.status(404).json({
-					msg: 'channel not found'
+					msg: "channel not found",
 				});
 			}
 
@@ -348,15 +468,23 @@ module.exports = {
 			const user = await User.findById(req.payload.id);
 
 			if (user.likedChannels.includes(channel._id)) {
-				return res.status(402).json({
-					msg: 'user has already liked this channel'
+				// remove the like
+				user.likedChannels.splice(
+					user.likedChannels.indexOf(channel._id),
+					1
+				);
+
+				await user.save();
+
+				return res.status(200).json({
+					inc: -1,
 				});
 			}
 
 			await user.likeChannel(channel._id);
 
 			res.status(200).json({
-				msg: 'channel liked'
+				inc: 1,
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/like", "red");
@@ -369,19 +497,31 @@ module.exports = {
 		try {
 			const { id } = req.params;
 
-			const channel = await Channel.findOne({ uniqueId: id });
+			let channel;
+
+			// check if id is object id
+			if (mongoose.Types.ObjectId.isValid(id)) {
+				channel = await Channel.findById(id);
+			} else {
+				channel = await Channel.findOne({ uniqueId: id });
+			}
+
+			if (!channel) {
+				return res.status(404).json({
+					msg: "channel not found",
+				});
+			}
 
 			// count all users with likedChannels.includes(id)
 			const count = await User.countDocuments({
 				likedChannels: {
-					$in: [channel._id]
-				}
+					$in: [channel._id],
+				},
 			});
 
-
 			res.status(200).json({
-				msg: 'total likes',
-				totalLikes: count
+				msg: "total likes",
+				totalLikes: count,
 			});
 		} catch (e) {
 			helper.log(e, "ROUTE: /api/channel/getTotalLikes", "red");
@@ -389,5 +529,124 @@ module.exports = {
 				msg: e,
 			});
 		}
-	}
+	},
+	addComment: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			let channel;
+
+			if (mongoose.Types.ObjectId.isValid(id)) {
+				channel = await Channel.findById(id);
+			} else {
+				channel = await Channel.findOne({ uniqueId: id });
+			}
+			
+			if (!channel) {
+				return res.status(404).json({
+					msg: "channel not found",
+				});
+			}
+
+			const { comment } = req.body;
+
+			await new Comment({
+				commentorId: req.payload.id,
+				comment,
+				replyTo: null,
+				channelId: channel._id,
+			}).save();
+
+			res.status(200).json({
+				msg: "comment added",
+			});
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/addComment", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	deleteComment: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			const comment = await Comment.findById(id);
+
+			if (!comment) {
+				return res.status(404).json({
+					msg: "comment not found",
+				});
+			}
+
+			await comment.delete();
+
+			res.status(200).json({
+				msg: "comment deleted",
+			});
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/deleteComment", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	getComments: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			let channel;
+
+			if (mongoose.Types.ObjectId.isValid(id)) {
+				channel = await Channel.findById(id);
+			} else {
+				channel = await Channel.findOne({ uniqueId: id });
+			}
+
+
+			if (!channel) {
+				return res.status(404).json({
+					msg: "channel not found",
+				});
+			}
+
+			// get comments with User username
+			// using aggregation
+			const comments = await Comment.aggregate([
+				{
+					$match: {
+						channelId: channel._id,
+					},
+				},
+				{
+					$lookup: {
+						from: "users",
+						localField: "commentorId",
+						foreignField: "_id",
+						as: "commentor",
+					},
+				},
+				{
+					$unwind: "$commentor",
+				},
+				{
+					$project: {
+						comment: 1,
+						createdAt: 1,
+						commentor: {
+							_id: 1,
+							username: 1,
+						},
+					},
+				},
+			]);
+
+			res.status(200).json(comments);
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/getComments", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
 };

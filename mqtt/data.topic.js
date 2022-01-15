@@ -45,105 +45,110 @@ module.exports = {
 			for (let field of channel.fields) {
 				const filter = await Filter.findById(field.filterId);
 
-				if (!filter) {
-					continue;
-				}
+				value = data[field];
 
-				const parser = new Parser();
+				// if the channel have any filter assigned to it
+				// run the filter expression to the data
+				if (filter) {
+					const parser = new Parser();
 
-				const expression = parser.parse(filter.expression);
+					const expression = parser.parse(filter.expression);
 
-				const variables = {};
-				let hasVariable = true;
+					const variables = {};
+					let hasVariable = true;
 
-				for (let variable of expression.variables()) {
-					const dt = await Data.findOne({
-						channelId: channel._id,
-						fieldName: field.label,
-					})
-						.sort({ createdAt: -1 })
-						.limit(1);
+					for (let variable of expression.variables()) {
+						const dt = await Data.findOne({
+							channelId: channel._id,
+							fieldName: field.label,
+						})
+							.sort({ createdAt: -1 })
+							.limit(1);
 
-					if (data[variable] || dt) {
-						variables[variable] = data[variable] || dt.value;
-					} else {
-						hasVariable = false;
-						break;
+						if (data[variable] || dt) {
+							variables[variable] = data[variable] || dt.value;
+						} else {
+							hasVariable = false;
+							break;
+						}
+					}
+
+					if (hasVariable) {
+						value = expression.evaluate(variables);
+
+						if (typeof value === NaN) {
+							continue;
+						}
+
+						const { dataType } = field;
+						if (typeof value !== dataType) {
+							// fix it
+							if (
+								dataType === "boolean" &&
+								typeof value === "number"
+							) {
+								value = value === 1;
+							}
+
+							if (
+								dataType === "number" &&
+								typeof value === "boolean"
+							) {
+								value = value ? 1 : 0;
+							}
+
+							if (
+								dataType === "string" &&
+								typeof value === "number"
+							) {
+								value = value.toString();
+							}
+
+							if (
+								dataType === "string" &&
+								typeof value === "boolean"
+							) {
+								value = value ? "true" : "false";
+							}
+
+							if (
+								dataType === "number" &&
+								typeof value === "string"
+							) {
+								value = parseFloat(value);
+							}
+
+							if (
+								dataType === "boolean" &&
+								typeof value === "string"
+							) {
+								value = value === "true";
+							}
+						}
 					}
 				}
 
-				if (hasVariable) {
-					const value = expression.evaluate(variables);
+				const newData = new Data({
+					channelId: channel._id,
+					fieldName: field.label,
+					value,
+				});
 
-					if (typeof value === NaN) {
-						continue;
-					}
+				await newData.save();
 
-					const { dataType } = field;
-					if (typeof value !== dataType) {
-						// fix it
-						if (
-							dataType === "boolean" &&
-							typeof value === "number"
-						) {
-							value = value === 1;
-						}
-
-						if (
-							dataType === "number" &&
-							typeof value === "boolean"
-						) {
-							value = value ? 1 : 0;
-						}
-
-						if (
-							dataType === "string" &&
-							typeof value === "number"
-						) {
-							value = value.toString();
-						}
-
-						if (
-							dataType === "string" &&
-							typeof value === "boolean"
-						) {
-							value = value ? "true" : "false";
-						}
-
-						if (
-							dataType === "number" &&
-							typeof value === "string"
-						) {
-							value = parseFloat(value);
-						}
-
-						if (
-							dataType === "boolean" &&
-							typeof value === "string"
-						) {
-							value = value === "true";
-						}
-					}
-
-					const data = new Data({
-						channelId: channel._id,
-						fieldName: field.label,
+				isUpdated = true;
+				client.publish(
+					`iot-dash/${channel.uniqueId}/${field.label}/update`,
+					JSON.stringify({
+						channel: channel.title,
+						field: field.label,
 						value,
-					});
-
-					await data.save();
-
-                    
-					isUpdated = true;
-                    client.publish(`iot-dash/${channel.uniqueId}/${field.label}/update`, JSON.stringify({
-                        value,
-                        date: new Date(data.createdAt).getTime()
-                    }));
-				}
+						date: new Date(Date.now()).getTime(),
+					})
+				);
 			}
 
 			if (isUpdated) {
-
 				// update next window time
 				channel.updateNextWindowTime();
 			}

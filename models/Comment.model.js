@@ -8,6 +8,6 @@ const schema = new Schema({
     channelId: mongoose.Types.ObjectId,
 }, { timestamps: true });
 
-const Data = mongoose.model('Comment', schema);
+const Comment = mongoose.model('Comment', schema);
 
-module.exports = Data;
+module.exports = Comment;

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation, useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext, useNavigate } from "react-router-dom";
+import { useSubscription } from "mqtt-react-hooks";
 import Tippy from "@tippyjs/react";
 
 import PageHeader from "components/PageHeader.component";
@@ -10,77 +11,67 @@ import styles from "styles/user/channel/View.module.scss";
 import {
 	FaClock,
 	FaComment,
+	FaCrown,
 	FaEye,
 	FaHeart,
 	FaPaperPlane,
+	FaTrashAlt,
 } from "react-icons/fa";
 
 function ViewChannel() {
 	const location = useLocation();
+	const navigate = useNavigate();
+	const { message, connectionStatus } = useSubscription(
+		"iot-dash/+/+/update"
+	);
+
 	const [user, setUser] = useOutletContext();
 
 	const [channel, setChannel] = useState({});
-	const [data, setData] = useState([
-		{
-			date: new Date(2021, 0, 1).getTime(),
-			value: 100,
-		},
-		{
-			date: new Date(2021, 0, 2).getTime(),
-			value: 320,
-		},
-		{
-			date: new Date(2021, 0, 3).getTime(),
-			value: 216,
-		},
-		{
-			date: new Date(2021, 0, 4).getTime(),
-			value: 150,
-		},
-		{
-			date: new Date(2021, 0, 5).getTime(),
-			value: 156,
-		},
-		{
-			date: new Date(2021, 0, 6).getTime(),
-			value: 199,
-		},
-		{
-			date: new Date(2021, 0, 7).getTime(),
-			value: 114,
-		},
-		{
-			date: new Date(2021, 0, 8).getTime(),
-			value: 269,
-		},
-		{
-			date: new Date(2021, 0, 9).getTime(),
-			value: 90,
-		},
-		{
-			date: new Date(2021, 0, 10).getTime(),
-			value: 300,
-		},
-		{
-			date: new Date(2021, 0, 11).getTime(),
-			value: 150,
-		},
-		{
-			date: new Date(2021, 0, 12).getTime(),
-			value: 110,
-		},
-		{
-			date: new Date(2021, 0, 13).getTime(),
-			value: 185,
-		},
-	]);
+	const [data, setData] = useState([]);
+	const [fields, setFields] = useState([]);
 	const [log, setLog] = useState([]);
 	const [likes, setLikes] = useState(0);
 	const [comments, setComments] = useState([]);
 	const [totalComments, setTotalComments] = useState(0);
 	const [totalViews, setTotalViews] = useState(0);
+	const [id, setId] = useState("");
 
 	const logRef = useRef({});
+	const commentRef = useRef({});
+
+	const addComment = async () => {
+		try {
+			const commentText = commentRef.current.value;
+
+			if (commentText.length > 0) {
+				const req = await fetch(
+					"http://localhost:8080/api/channel/comment/" +
+						location.state.id,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							auth: user.token,
+						},
+						body: JSON.stringify({
+							comment: commentText,
+						}),
+					}
+				);
+
+				if (req.status === 200) {
+					// refresh the page using react router
+					navigate(0);
+
+					// smooth scroll to bottom
+					commentRef.scrollTop = commentRef.scrollHeight;
+				}
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	};
 
 	useEffect(() => {
 		if (logRef.current) {
@@ -106,8 +97,32 @@ function ViewChannel() {
 				);
 
 				if (req.status === 200) {
-					setLikes(likes + 1);
+					const { inc } = await req.json();
+
+					setLikes(likes + inc);
 				}
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const deleteComment = async (id) => {
+		try {
+			const req = await fetch(
+				"http://localhost:8080/api/channel/comment/" + id,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+						auth: user.token,
+					},
+				}
+			);
+
+			if (req.status === 200) {
+				// refresh the page using react router
+				navigate(0);
 			}
 		} catch (e) {
 			console.error(e);
@@ -119,6 +134,7 @@ function ViewChannel() {
 			if (location.state.id) {
 				let req, res;
 				let tViews = 0;
+				let ownerId = "";
 
 				req = await fetch(
 					`http://localhost:8080/api/channel/public/${location.state.id}`,
@@ -133,8 +149,11 @@ function ViewChannel() {
 				if (req.status === 200) {
 					res = await req.json();
 
+					console.log("channel", res);
+
 					tViews = res.views || 0;
 
+					ownerId = res.ownerId;
 					setChannel(res);
 				}
 
@@ -170,6 +189,44 @@ function ViewChannel() {
 				if (req.status === 200) {
 					setTotalViews(tViews + 1);
 				}
+
+				req = await fetch(
+					"http://localhost:8080/api/channel/comments/" +
+						location.state.id,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					console.log(res);
+
+					setTotalComments(res.length);
+					setComments(
+						res.map((c) => {
+							// change the createdAt to date string
+							// hh:mm am/pm, Month DD
+							// example = "12:00 pm, Jan 01"
+							const date = new Date(c.createdAt);
+							const time = date.toLocaleTimeString();
+							const month = date.toLocaleString("default", {
+								month: "short",
+							});
+							const day = date.getDate();
+
+							return {
+								...c,
+								createdAt: `${time}, ${month} ${day}`,
+								isOwner: c.commentor._id === ownerId,
+							};
+						})
+					);
+				}
 			}
 		})();
 	}, [location.state.id]);
@@ -179,16 +236,73 @@ function ViewChannel() {
 		window.scrollTo(0, 0);
 	}, []);
 
-	const test = () => {
-		const now = new Date();
-		const nowStr = `${now.getDate()}/${
-			now.getMonth() + 1
-		} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-		setLog([
-			...log,
-			[`Device ${log.length}`, "text", nowStr, "somerandomdata123"],
-		]);
-	};
+	useEffect(() => {
+		try {
+			if (connectionStatus === "Connected" && id !== "") {
+				if (message) {
+					const topic = message.topic.split("/");
+					const body = JSON.parse(message.message);
+
+					if (topic[1] === id) {
+						const newData = { ...data };
+						if (newData[topic[2]]) {
+							newData[topic[2]].push(body);
+						} else {
+							newData[topic[2]] = [body];
+						}
+
+						const newLog = [...log];
+
+						// convert data.date to date string
+						// hh:mm:ss, Month DD
+						const dateStr = new Date(body.date).toLocaleString();
+						const date = dateStr.split(",")[0];
+						const month = dateStr.split(",")[1];
+
+						newLog.push([
+							body.channel,
+							body.field,
+							body.value,
+							`${date}, ${month}`,
+						]);
+
+						setLog(newLog);
+
+						setData(newData);
+					}
+				}
+			}
+		} catch (e) {
+			console.log(e);
+		}
+	}, [message, connectionStatus, id]);
+
+	useEffect(() => {
+		(async () => {
+			if (location.state.id) {
+				let req, res;
+
+				req = await fetch(
+					"http://localhost:8080/api/channel/fields/data/" +
+						location.state.id,
+					{
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				if (req.status === 200) {
+					res = await req.json();
+
+					setId(res.id);
+					setData(res.data);
+					setFields(Object.keys(res.data));
+				}
+			}
+		})();
+	}, [location.state.id]);
 
 	return (
 		<div className="container">
@@ -216,7 +330,7 @@ function ViewChannel() {
 							<div className={styles.item}>
 								<div className={styles.label}>Owner</div>
 								<div className={styles.value}>
-									Aidil Syazwan
+									{channel.owner && channel.owner.username}
 								</div>
 							</div>
 							<div className={styles.item}>
@@ -231,15 +345,17 @@ function ViewChannel() {
 						<div className={styles.col}>
 							<div className={styles.item}>
 								<div className={styles.label}>Data per day</div>
-								<div className={styles.value}>500</div>
+								<div className={styles.value}>
+									{channel.dataPerDay || 0}
+								</div>
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Views</div>
-								<div className={styles.value}>4.73</div>
+								<div className={styles.value}>{totalViews}</div>
 							</div>
 							<div className={styles.item}>
 								<div className={styles.label}>Likes</div>
-								<div className={styles.value}>32</div>
+								<div className={styles.value}>{likes}</div>
 							</div>
 						</div>
 						<div className={styles.row}>
@@ -294,26 +410,29 @@ function ViewChannel() {
 					</div>
 				</FolderCard>
 
-				<DateAxisLineChart
-					title="Field: temp"
-					data={data}
-					label="Profit"
-					height="250px"
-				/>
+				<div className={styles.fields}>
+					{fields.map((field, index) => (
+						<div key={index}>
+							<DateAxisLineChart
+								title={field}
+								label={`${field}${index}`}
+								data={data[field]}
+								height="250px"
+								stepped={false}
+							/>
+						</div>
+					))}
+				</div>
 
 				<FolderCard title="Live update">
 					<div className={styles.log}>
 						<div className={styles.headers}>
-							<div className={styles.header}>Source</div>
+							<div className={styles.header}>Channel</div>
 							<div className={styles.header}>Field</div>
-							<div className={styles.header}>Timestamp</div>
 							<div className={styles.header}>Data</div>
+							<div className={styles.header}>Timestamp</div>
 						</div>
-						<div
-							className={styles.list}
-							ref={logRef}
-							onClick={test}
-						>
+						<div className={styles.list} ref={logRef}>
 							{log.map((item, index) => (
 								<div className={styles.item} key={index}>
 									<div className={styles.device}>
@@ -330,20 +449,49 @@ function ViewChannel() {
 
 				<div className={styles.comments}>
 					<div className={styles.list}>
+						{comments.length === 0 && "No one commented yet..."}
 						{comments.map((item, index) => (
-							<div className={styles.comment}>
-								<div className={styles.user}>
-									<div className={styles.avatar}></div>
-									<div className={styles.name}>Aidilsyaz</div>
+							<div key={index} className={styles.comment}>
+								<div
+									className={`${styles.user} ${
+										item.isOwner && styles.owner
+									}`}
+								>
+									<div className={styles.avatar}>
+										{item.commentor.username[0]}
+									</div>
+									{(item.isOwner && (
+										<Tippy content="Channel owner" delay={[500, 0]} duration={[100, 100]} animation="scale" inertia="true">
+											<div className={styles.name}>
+												{item.commentor.username}
+												<FaCrown />
+											</div>
+										</Tippy>
+									)) || (
+										<div className={styles.name}>
+											{item.commentor.username}
+										</div>
+									)}
 								</div>
 								<div className={styles.content}>
-									Lorem ipsum dolor sit amet consectetur,
-									adipisicing elit. Provident, repellendus.
+									{item.comment}
 								</div>
 								<div className={styles.date}>
 									<FaClock style={{ color: "#2179ff" }} />
-									12/12/1212
+									{item.createdAt}
 								</div>
+								{item.commentor &&
+									user.id &&
+									item.commentor._id === user.id && (
+										<div
+											className={`neon-btn ${styles.delete}`}
+											onClick={() =>
+												deleteComment(item._id)
+											}
+										>
+											<FaTrashAlt />
+										</div>
+									)}
 							</div>
 						))}
 					</div>
@@ -351,10 +499,10 @@ function ViewChannel() {
 					<div className={styles.input}>
 						<div className={styles.label}>Write something...</div>
 						<div className={styles.inputField}>
-							<textarea></textarea>
+							<textarea ref={commentRef}></textarea>
 						</div>
 						<div className={styles.buttons}>
-							<div className="neon-btn">
+							<div className="neon-btn" onClick={addComment}>
 								<FaPaperPlane />
 								Comment
 							</div>

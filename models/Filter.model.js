@@ -5,6 +5,10 @@ const schema = new Schema({
     label: String,
     expression: String,
     fields: [String],
+    testValues: [{
+        label: String,
+        value: String,
+    }],
     ownerId: mongoose.Types.ObjectId,
 }, { timestamps: true });
 

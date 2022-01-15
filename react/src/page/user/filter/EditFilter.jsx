@@ -112,7 +112,7 @@ function AddDevicePage() {
 
 			const fields = vars.map((v) => v.name);
 
-			const request = await fetch(
+			let request = await fetch(
 				"http://localhost:8080/api/filter/update",
 				{
 					method: "PATCH",
@@ -130,7 +130,24 @@ function AddDevicePage() {
 			);
 
 			if (request.status === 200) {
-				navigate("/user/filters", { replace: true });
+				request = await fetch(
+					"http://localhost:8080/api/filter/updatetest/" +
+						location.state.id,
+					{
+						method: "PATCH",
+						headers: {
+							"Content-Type": "application/json",
+							auth: user.token,
+						},
+						body: JSON.stringify({
+							testValues: vars,
+						}),
+					}
+				);
+
+				if (request.status === 200) {
+					navigate("/user/filters", { replace: true });
+				}
 			}
 		} catch (e) {
 			alert("Error creating filter: " + e);
@@ -156,7 +173,18 @@ function AddDevicePage() {
 				if (req.status === 200) {
 					res = await req.json();
 
-					setVars(res.fields.map((f) => ({ name: f, value: 0 })));
+					const testVars = res.fields.map((f) => ({
+						name: f,
+						value: 0,
+					}));
+
+					if (res.testValues && res.testValues.length > 0) {
+						testVars.forEach((v, i) => {
+							v.value = res.testValues[i].value;
+						});
+					}
+
+					setVars(testVars);
 
 					filterNameRef.current.value = res.label;
 					exprRef.current.value = res.expression;

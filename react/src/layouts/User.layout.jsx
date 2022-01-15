@@ -18,7 +18,7 @@ export default function UserLayout(props) {
 		},
 		{
 			path: "/user/browse",
-			name: "Browse Data",
+			name: "Browse",
 			icon: "FaClipboardList",
 		},
 		{
@@ -68,6 +68,7 @@ export default function UserLayout(props) {
 		setUser({
 			token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVkZWwiLCJpZCI6IjYxMGFiNjc5NGZiZWQxNjkzOGFmZTZjMyIsImlhdCI6MTY0MTc5MDgyMH0.KJXsw1wiYyN8eiRFVLMkwvr1y9mdHiWnl86s3_WwF3I',
 			username: 'admin',
+			id: '610ab6794fbed16938afe6c3',
 		})
 	}, []);
 

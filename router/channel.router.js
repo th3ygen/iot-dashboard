@@ -32,4 +32,8 @@ router.get('/likes/:id', controller.channel.getTotalLikes);
 
 router.get('/view/:id', controller.channel.addView);
 
+router.post('/comment/:id', middleware.jwt.verifyJWT, controller.channel.addComment);
+router.get('/comments/:id', controller.channel.getComments);
+router.delete('/comment/:id', middleware.jwt.verifyJWT, controller.channel.deleteComment);
+
 module.exports = router;

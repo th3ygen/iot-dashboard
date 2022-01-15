@@ -10,6 +10,7 @@ router.post('/create', middleware.auth.verifyJWT, controller.create);
 router.get('/owned', middleware.auth.verifyJWT, controller.getOwned);
 router.get('/id/:id', middleware.auth.verifyJWT, controller.getById);
 
+router.patch('/updatetest/:id', middleware.auth.verifyJWT, controller.updateTest);
 router.patch('/update', middleware.auth.verifyJWT, controller.update);
 
 

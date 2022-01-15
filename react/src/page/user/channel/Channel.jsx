@@ -72,7 +72,7 @@ function ChannelPage() {
 				]}
 			/>
 			<div className={styles.content}>
-				<div className={styles.widget}>
+				{/* <div className={styles.widget}>
 					<NumberWidget
 						title="Total channels"
 						value="1,234"
@@ -93,7 +93,7 @@ function ChannelPage() {
 						style={{ fontSize: "18px" }}
 					/>
 				</div>
-
+ */}
 				<Table
 					title="Manage channels"
 					headers={[

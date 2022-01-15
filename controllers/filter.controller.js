@@ -68,6 +68,50 @@ module.exports = {
             });
         }
     },
+    updateTest: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { testValues } = req.body;
+
+            const filter = await Filter.findById(id);
+
+            if (!filter) {
+                return res.status(404).json({
+                    msg: 'filter not found'
+                });
+            }
+
+            if (!filter.testValues) {
+                filter.testValues = [];
+            }
+
+            const u = [];
+
+            filter.fields.forEach((field) => {
+                const f = testValues.find((q) => q.label === field.label);
+
+                if (f) {
+                    u.push({
+                        label: field.label,
+                        value: f.value,
+                    });
+                }
+            });
+            filter.testValues = u;
+
+            await filter.save();
+
+            res.status(200).json({
+                msg: 'filter updated'
+            });
+        }
+        catch (e) {
+            helper.log(pe.render(e), "ROUTE: /api/filter/updateTest", "red");
+            res.status(500).json({
+                msg: e,
+            });
+        }
+    },
     update: async (req, res) => {
         try {
             const { id } = req.body;
