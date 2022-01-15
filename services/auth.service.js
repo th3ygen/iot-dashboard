@@ -30,7 +30,12 @@ const login = (username, password) => (
                 username, id: user._id
             }, process.env.JWT_SECRET);
 
-            resolve(token);
+            resolve({
+                token,
+                id: user._id,
+                username: user.username,
+                role: user.role || 'user',
+            });
         } catch (e) {
             console.log(Object.keys(e));
             reject({
@@ -41,7 +46,7 @@ const login = (username, password) => (
     })
 );
 
-const register = (username, password, email) => (
+const register = (username, password, email, title) => (
     new Promise(async (resolve, reject) => {
         try {
             // username must be unique
@@ -94,7 +99,7 @@ const register = (username, password, email) => (
                 });
             }
 
-            const usernameExists = await User.findOne({ username });
+            /* const usernameExists = await User.findOne({ username });
 
             if (usernameExists) {
                 return reject({
@@ -104,12 +109,12 @@ const register = (username, password, email) => (
                     },
                     msg: 'username already exist'
                 });
-            }
+            } */
 
             const hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALTROUNDS));
 
             user = new User({
-                username, hash, email
+                username, hash, email, title, role: 'user',
             });
 
             await user.save();
@@ -127,6 +132,29 @@ const register = (username, password, email) => (
     })
 );
 
+const getRole = (id) => (
+    new Promise(async (resolve, reject) => {
+        try {
+            const user = await User.findById(id);
+
+            if (!user) {
+                return reject({
+                    label: 'getRole',
+                    msg: 'user not found'
+                });
+
+            }
+
+            resolve(user.role);
+        } catch (e) {
+            reject({
+                label: 'getRole',
+                msg: e.message
+            });
+        }
+    })
+);
+
 module.exports = {
-    login, register
+    login, register, getRole,
 };

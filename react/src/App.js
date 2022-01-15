@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { Connector } from "mqtt-react-hooks";
 import logo from "./logo.svg";
 import "styles/App.module.scss";
@@ -33,6 +34,8 @@ import UpdateOrderPage from 'page/common/order/UpdateOrder'; */
 
 // Login
 import LoginPage from "page/Login";
+// Register
+import RegisterPage from "page/Register";
 
 // User -> Data
 import BrowseDataPage from "page/user/BrowseData";
@@ -79,12 +82,31 @@ function Home() {
 }
 
 function App() {
+	const [user, setUser] = useState({});
+
+	const login = (user) => {
+		localStorage.setItem("user", JSON.stringify(user));
+
+		setUser(user);
+	};
+
+	/* useEffect(() => {
+		const localUser = localStorage.getItem("user");
+
+		if (localUser) {
+			setUser(JSON.parse(localUser));
+		} else {
+			navigate("/login");
+		}
+	}, []); */
+
 	return (
 		<Connector brokerUrl="ws://localhost:9001" options={{ keepalive: 0 }} >
 			<div className="App">
 				<Routes>
-					<Route path="/login" element={<LoginPage />} />
-					<Route path="/user" element={<UserLayout />}>
+					<Route path="/login" element={<LoginPage onLogin={login}/>}/>
+					<Route path="/register" element={<RegisterPage />} />
+					<Route path="/user" element={<UserLayout user={user}/>}>
 						<Route index element={<Home />} />
 						{/* User -> Data */}
 						<Route path="/user/browse" element={<BrowseDataPage />} />

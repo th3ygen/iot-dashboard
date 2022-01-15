@@ -36,6 +36,7 @@ function ViewChannel() {
 	const [totalComments, setTotalComments] = useState(0);
 	const [totalViews, setTotalViews] = useState(0);
 	const [id, setId] = useState("");
+	const [ownerId, setOwnerId] = useState("");
 
 	const logRef = useRef({});
 	const commentRef = useRef({});
@@ -45,7 +46,7 @@ function ViewChannel() {
 			const commentText = commentRef.current.value;
 
 			if (commentText.length > 0) {
-				const req = await fetch(
+				let req = await fetch(
 					"http://localhost:8080/api/channel/comment/" +
 						location.state.id,
 					{
@@ -61,11 +62,41 @@ function ViewChannel() {
 				);
 
 				if (req.status === 200) {
-					// refresh the page using react router
-					navigate(0);
+					req = await fetch(
+						"http://localhost:8080/api/channel/comments/" +
+							location.state.id,
+						{
+							method: "GET",
+							headers: {
+								"Content-Type": "application/json",
+							},
+						}
+					);
 
-					// smooth scroll to bottom
-					commentRef.scrollTop = commentRef.scrollHeight;
+					if (req.status === 200) {
+						const res = await req.json();
+						setTotalComments(res.length);
+						setComments(
+							res.map((c) => {
+								// change the createdAt to date string
+								// hh:mm am/pm, Month DD
+								// example = "12:00 pm, Jan 01"
+								const date = new Date(c.createdAt);
+								const time = date.toLocaleTimeString();
+								const month = date.toLocaleString("default", {
+									month: "short",
+								});
+								const day = date.getDate();
+
+								return {
+									...c,
+									createdAt: `${time}, ${month} ${day}`,
+									isOwner: c.commentor._id === ownerId,
+								};
+							})
+						);
+					}
+
 				}
 			}
 		} catch (e) {
@@ -134,7 +165,7 @@ function ViewChannel() {
 			if (location.state.id) {
 				let req, res;
 				let tViews = 0;
-				let ownerId = "";
+				let oId = "";
 
 				req = await fetch(
 					`http://localhost:8080/api/channel/public/${location.state.id}`,
@@ -151,7 +182,8 @@ function ViewChannel() {
 
 					tViews = res.views || 0;
 
-					ownerId = res.ownerId;
+					oId = res.ownerId;
+					setOwnerId(oId);
 					setChannel(res);
 				}
 
@@ -217,7 +249,7 @@ function ViewChannel() {
 							return {
 								...c,
 								createdAt: `${time}, ${month} ${day}`,
-								isOwner: c.commentor._id === ownerId,
+								isOwner: c.commentor._id === oId,
 							};
 						})
 					);
@@ -232,6 +264,7 @@ function ViewChannel() {
 	}, []);
 
 	useEffect(() => {
+		console.log(connectionStatus);
 		try {
 			if (connectionStatus === "Connected" && id !== "") {
 				if (message) {
@@ -456,7 +489,13 @@ function ViewChannel() {
 										{item.commentor.username[0]}
 									</div>
 									{(item.isOwner && (
-										<Tippy content="Channel owner" delay={[500, 0]} duration={[100, 100]} animation="scale" inertia="true">
+										<Tippy
+											content="Channel owner"
+											delay={[500, 0]}
+											duration={[100, 100]}
+											animation="scale"
+											inertia="true"
+										>
 											<div className={styles.name}>
 												{item.commentor.username}
 												<FaCrown />

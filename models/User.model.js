@@ -19,11 +19,14 @@ const schema = new Schema(
       index: true,
     },
 
+    title: String,
+
     likedChannels: [mongoose.Schema.Types.ObjectId],
 
     hash: String,
     salt: Number,
     avatar: String,
+    role: String,
   },
   { timestamps: true }
 );

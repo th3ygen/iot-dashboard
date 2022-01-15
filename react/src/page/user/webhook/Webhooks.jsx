@@ -69,8 +69,14 @@ function WebhooksPage() {
 			<div className={styles.content}>
 				<Table
 					title="Manage webhooks"
-					headers={["Label", "Trigger", "Req. status", "Req. message", "Status"]}
-					colWidthPercent={["20%", "10%", "10%" , "20%", "10%"]}
+					headers={[
+						"Label",
+						"Trigger",
+						"Req. status",
+						"Req. message",
+						"Status",
+					]}
+					colWidthPercent={["20%", "10%", "10%", "20%", "10%"]}
 					centered={[false, false, true, false, false]}
 					items={webhooks}
 					actions={[
@@ -78,7 +84,9 @@ function WebhooksPage() {
 							tooltip: "Edit",
 							icon: "FaEdit",
 							callback: async (id) => {
-								navigate('/user/webhooks/edit', { state: { id }});
+								navigate("/user/webhooks/edit", {
+									state: { id },
+								});
 							},
 						},
 						{
@@ -89,11 +97,13 @@ function WebhooksPage() {
 								try {
 									if (user.token) {
 										req = await fetch(
-											"http://localhost:8080/api/webhook/delete/"+id,
+											"http://localhost:8080/api/webhook/delete/" +
+												id,
 											{
 												method: "DELETE",
 												headers: {
-													"Content-Type": "application/json",
+													"Content-Type":
+														"application/json",
 													auth: user.token,
 												},
 											}
@@ -104,7 +114,8 @@ function WebhooksPage() {
 
 											setWebhooks(
 												webhooks.filter(
-													(webhook) => webhook[0] !== id
+													(webhook) =>
+														webhook[0] !== id
 												)
 											);
 										}
@@ -119,22 +130,57 @@ function WebhooksPage() {
 							icon: "FaExchangeAlt",
 							callback: async (id) => {
 								try {
-									const res = await fetch('http://localhost:8080/api/webhook/toggle/' + id, {
-										method: "POST",
-										headers: {
-											"Content-Type": "application/json",
-											auth: user.token,
-										},
-									});
+									let res, req;
+									res = await fetch(
+										"http://localhost:8080/api/webhook/toggle/" +
+											id,
+										{
+											method: "POST",
+											headers: {
+												"Content-Type":
+													"application/json",
+												auth: user.token,
+											},
+										}
+									);
 
 									if (res.status === 200) {
-										navigate(0);
+										req = await fetch(
+											"http://localhost:8080/api/webhook/owned",
+											{
+												method: "GET",
+												headers: {
+													"Content-Type":
+														"application/json",
+													auth: user.token,
+												},
+											}
+										);
+
+										if (req.status === 200) {
+											res = await req.json();
+
+											setWebhooks(
+												res.map((webhook) => [
+													webhook._id,
+													webhook.label,
+													webhook.trigger,
+													webhook.lastStatus,
+													webhook.lastRequestMessage,
+													`${
+														webhook.active
+															? "Active"
+															: "Inactive"
+													}:#FFF`,
+												])
+											);
+										}
 									}
 								} catch (e) {
 									console.error(e);
 								}
-							}
-						}
+							},
+						},
 					]}
 				/>
 			</div>

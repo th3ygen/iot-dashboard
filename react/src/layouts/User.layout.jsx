@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import styles from "styles/layout/User.module.scss";
 
@@ -8,6 +8,9 @@ import Topbar from "components/Topbar.component";
 
 
 export default function UserLayout(props) {
+	const location = useLocation();
+	const navigate = useNavigate();
+
 	const [user, setUser] = useState({});
 
 	const paths = [
@@ -59,22 +62,18 @@ export default function UserLayout(props) {
 	];
 
 	useEffect(() => {
-		/* if (localStorage.getItem("user")) {
-			setUser(JSON.parse(localStorage.getItem("user")));
+		const localUser = localStorage.getItem("user");
+
+		if (localUser) {
+			setUser(JSON.parse(localUser));
 		} else {
-			alert("You are not logged in!");
-			navigate("/");
-		} */
-		setUser({
-			token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVkZWwiLCJpZCI6IjYxMGFiNjc5NGZiZWQxNjkzOGFmZTZjMyIsImlhdCI6MTY0MTc5MDgyMH0.KJXsw1wiYyN8eiRFVLMkwvr1y9mdHiWnl86s3_WwF3I',
-			username: 'admin',
-			id: '610ab6794fbed16938afe6c3',
-		})
+			navigate("/login");
+		}
 	}, []);
 
 	return (
 		<div>
-			<Topbar />
+			<Topbar context={[user, setUser]}/>
 			<Navbar paths={paths} username={"edel"} title={"User"}/>
 			<div className={styles.content}>
 				<Outlet context={[user, setUser]}/>

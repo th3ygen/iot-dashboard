@@ -5,12 +5,24 @@ import { FaReply } from "react-icons/fa";
 
 import styles from "styles/component/Topbar.module.scss";
 
-export default function Topbar() {
+export default function Topbar(props) {
 	const navigate = useNavigate();
+	
+	const [user, setUser] = props.context;
 
 	const goBack = () => {
 		navigate(-1);
 	};
+
+	const logout = () => {
+		setUser({});
+
+		localStorage.removeItem("user");
+
+		navigate("/login", {
+			replace: true
+		});
+	}
 
 	return (
 		<div className={`${styles.container}`}>
@@ -25,7 +37,7 @@ export default function Topbar() {
 					</div>
 				</div>
 				<div className={styles["user-action"]}>
-					<div className={styles.logout}>
+					<div className={styles.logout} onClick={logout}>
 						<LogoutIcon size={20} />
 						Logout
 					</div>

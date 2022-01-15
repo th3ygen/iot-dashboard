@@ -6,11 +6,9 @@ module.exports = {
         try {
             const { username, password } = req.body;
 
-            const token = await auth.login(username, password);
+            const user = await auth.login(username, password);
 
-            res.status(200).json({
-                token
-            });
+            res.status(200).json(user);
         } catch (e) {
             helper.log(e.msg, e.label, 'red');
             res.status(401).json({
@@ -22,9 +20,9 @@ module.exports = {
 
     register: async (req, res) => {
         try {
-            const { username, password, email } = req.body;
+            const { username, password, email, title } = req.body;
 
-            await auth.register(username, password, email);
+            await auth.register(username, password, email, title);
 
             res.status(200).json({
                 msg: 'user created'
@@ -33,6 +31,18 @@ module.exports = {
             helper.log(e.msg, e.label, 'red');
             res.status(401).json({
                 msg: 'invalid username or password'
+            });
+        }
+    },
+    getRole: async (req, res) => {
+        try {
+            const role = await auth.getRole(req.payload.id);
+
+            res.status(200).json(role);
+        } catch (e) {
+            helper.log(e.msg, e.label, 'red');
+            res.status(500).json({
+                msg: 'error getting role'
             });
         }
     }

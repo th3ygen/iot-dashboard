@@ -195,7 +195,7 @@ function AddWebhookPage() {
 					</div>
 					<div className={`${styles.item} ${styles.addBtn}`}>
 						<div className="neon-btn" onClick={updateWebhook}>
-							<FaPlus /> <span>Add webhook</span>
+							<FaPlus /> <span>Edit webhook</span>
 						</div>
 					</div>
 				</div>

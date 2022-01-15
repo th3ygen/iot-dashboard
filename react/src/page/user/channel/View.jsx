@@ -122,6 +122,7 @@ function ViewChannel() {
 	};
 
 	useEffect(() => {
+		console.log(connectionStatus);
 		try {
 			if (connectionStatus === "Connected" && id !== "") {
 				if (message) {
