@@ -10,6 +10,28 @@ const User = require("../models/user.model");
 const Comment = require("../models/Comment.model");
 
 module.exports = {
+	list: async (req, res) => {
+		try {
+			let channels = await Channel.find();
+
+			let result = [];
+
+			// add owner username to each channel
+			for (let i = 0; i < channels.length; i++) {
+				let owner = await User.findById(channels[i].ownerId);
+				
+				result.push({
+					...channels[i]._doc,
+					owner: owner.username
+				});
+			}
+
+			res.status(200).json(result);
+		} catch (err) {
+			console.log(pe.render(err));
+			res.status(500).send(err);
+		}
+	},
 	getOwned: async (req, res) => {
 		try {
 			const channels = await Channel.find({ ownerId: req.payload.id });
@@ -541,7 +563,7 @@ module.exports = {
 			} else {
 				channel = await Channel.findOne({ uniqueId: id });
 			}
-			
+
 			if (!channel) {
 				return res.status(404).json({
 					msg: "channel not found",
@@ -602,7 +624,6 @@ module.exports = {
 			} else {
 				channel = await Channel.findOne({ uniqueId: id });
 			}
-
 
 			if (!channel) {
 				return res.status(404).json({

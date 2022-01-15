@@ -31,11 +31,18 @@ function Login(props) {
 					username: res.username,
 					id: res.id,
                     role: res.role,
+                    title: res.title,
 				})
 
-				navigate("/user/channels", {
-					replace: true,
-				});
+                if (res.role === "admin") {
+                    navigate("/admin", {
+                        replace: true,
+                    });
+                } else {
+                    navigate("/user", {
+                        replace: true,
+                    });
+                }
 			} else {
 				console.log("login failed");
 

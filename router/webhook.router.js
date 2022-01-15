@@ -7,6 +7,8 @@ const middleware = {
     auth: require('../middlewares/auth.middleware')
 };
 
+router.get('/list', [middleware.auth.verifyJWT, middleware.auth.adminOnly], controller.webhook.list);
+
 router.post('/create', middleware.auth.verifyJWT, controller.webhook.create);
 router.patch('/update/:id', middleware.auth.verifyJWT, controller.webhook.update);
 router.delete('/delete/:id', middleware.auth.verifyJWT, controller.webhook.delete);

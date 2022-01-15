@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Key = mongoose.model('Key');
+const User = mongoose.model('User');
 
 const verifyKey = async key => {
     const result = await Key.verify(key);
@@ -9,6 +10,28 @@ const verifyKey = async key => {
 };
 
 module.exports = {
+    list: async (req, res) => {
+        try {
+            const keys = await Key.find();
+
+            const result = [];
+
+            for (let i = 0; i < keys.length; i++) {
+                const owner = await User.findById(keys[i].ownerId);
+
+                result.push({
+                    ...keys[i]._doc,
+                    owner: owner.username,
+                });
+            }
+                
+
+            res.status(200).json(result);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send(err);
+        }
+    },
     create: async (label, username, id) => {
         const key = await Key.createKey(label, username, id);
 

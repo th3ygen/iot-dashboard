@@ -49,11 +49,11 @@ export default function UserLayout(props) {
 			name: "Webhooks",
 			icon: "FaConnectdevelop",
 		},
-		{
+		/* {
 			path: "/user/analytics",
 			name: "Analytics",
 			icon: "FaChartBar",
-		},
+		}, */
 		{
 			path: "/user/account",
 			name: "Account",
@@ -62,10 +62,18 @@ export default function UserLayout(props) {
 	];
 
 	useEffect(() => {
-		const localUser = localStorage.getItem("user");
+		let localUser = localStorage.getItem("user");
 
 		if (localUser) {
-			setUser(JSON.parse(localUser));
+            localUser = JSON.parse(localUser);
+
+			setUser(localUser);
+
+			if (localUser.role === "admin") {
+				navigate("/admin", {
+					replace: true,
+				});
+			}
 		} else {
 			navigate("/login");
 		}
@@ -74,7 +82,7 @@ export default function UserLayout(props) {
 	return (
 		<div>
 			<Topbar context={[user, setUser]}/>
-			<Navbar paths={paths} username={"edel"} title={"User"}/>
+			<Navbar paths={paths} username={user.username || "Loading..."} title={user.title || "Loading..."} />
 			<div className={styles.content}>
 				<Outlet context={[user, setUser]}/>
 			</div>

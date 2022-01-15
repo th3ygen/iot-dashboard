@@ -5,8 +5,32 @@ const PrettyError = require("pretty-error");
 const pe = new PrettyError();
 
 const Filter = mongoose.model("Filter");
+const User = mongoose.model('User');
 
 module.exports = {
+    list: async (req, res) => {
+        try {
+            const filters = await Filter.find({});
+
+            const result = [];
+
+            for (const filter of filters) {
+                const owner = await User.findById(filter.ownerId);
+
+                result.push({
+                    ...filter._doc,
+                    owner: owner.username,
+                });
+            }
+
+            res.status(200).json(result);
+        } catch (e) {
+            helper.log(e.message, "filter list", "red");
+            res.status(500).json({
+                msg: "error getting filters"
+            });
+        }
+    },
     create: async (req, res) => {
         try {
             const { label, expression, fields } = req.body;

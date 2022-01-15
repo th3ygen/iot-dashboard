@@ -7,6 +7,8 @@ const middleware = {
     jwt: require('../middlewares/auth.middleware')
 }
 
+router.get('/list', [middleware.jwt.verifyJWT, middleware.jwt.adminOnly], controller.channel.list);
+
 router.get('/owned', middleware.jwt.verifyJWT, controller.channel.getOwned);
 router.get('/id/:id', middleware.jwt.verifyJWT, controller.channel.getById);
 router.get('/public/:id', controller.channel.getPublic);

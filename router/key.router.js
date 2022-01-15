@@ -59,4 +59,6 @@ router.get('/find', middlewares.auth.verifyJWT, async (req, res) => {
 
 router.delete('/delete/:id', middlewares.auth.verifyJWT, controllers.key.delete);
 
+router.get('/list', [middlewares.auth.verifyJWT, middlewares.auth.adminOnly], controllers.key.list);
+
 module.exports = router;

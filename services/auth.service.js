@@ -27,7 +27,7 @@ const login = (username, password) => (
             }
 
             const token = jwt.sign({
-                username, id: user._id
+                username, id: user._id, role: user.role,
             }, process.env.JWT_SECRET);
 
             resolve({
@@ -35,6 +35,7 @@ const login = (username, password) => (
                 id: user._id,
                 username: user.username,
                 role: user.role || 'user',
+                title: user.title || 'Guest',
             });
         } catch (e) {
             console.log(Object.keys(e));
@@ -155,6 +156,45 @@ const getRole = (id) => (
     })
 );
 
+const deleteUser = (id) => (
+    new Promise(async (resolve, reject) => {
+        try {
+            const user = await User.findById(id);
+
+            if (!user) {
+                return reject({
+                    label: 'deleteUser',
+                    msg: 'user not found'
+                });
+            }
+
+            await user.remove();
+
+            resolve();
+        } catch (e) {
+            reject({
+                label: 'deleteUser',
+                msg: e.message
+            });
+        }
+    })
+);
+
+const getAll = () => (
+    new Promise(async (resolve, reject) => {
+        try {
+            const users = await User.find({});
+
+            resolve(users);
+        } catch (e) {
+            reject({
+                label: 'getAll',
+                msg: e.message
+            });
+        }
+    })
+);
+
 module.exports = {
-    login, register, getRole,
+    login, register, getRole, deleteUser, getAll
 };

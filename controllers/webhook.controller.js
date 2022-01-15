@@ -5,8 +5,32 @@ const PrettyError = require("pretty-error");
 const pe = new PrettyError();
 
 const Webhook = mongoose.model("Webhook");
+const User = mongoose.model("User");
 
 module.exports = {
+    list: async (req, res) => {
+        try {
+            const webhooks = await Webhook.find({});
+
+            const result = [];
+            
+            for (const webhook of webhooks) {
+                const owner = await User.findById(webhook.ownerId);
+
+                result.push({
+                    ...webhook._doc,
+                    owner: owner.username,
+                });
+            }
+
+            res.status(200).json(result);
+        } catch (e) {
+            helper.log(e.message, "webhook list", "red");
+            res.status(500).json({
+                msg: "error getting webhooks"
+            });
+        }
+    },
     create: async (req, res) => {
         try {
             const {

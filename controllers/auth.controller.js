@@ -45,5 +45,29 @@ module.exports = {
                 msg: 'error getting role'
             });
         }
+    },
+    delete: async (req, res) => {
+        try {
+            const user = await auth.deleteUser(req.payload.id);
+
+            res.status(200).json(user);
+        } catch (e) {
+            helper.log(e.msg, e.label, 'red');
+            res.status(500).json({
+                msg: 'error deleting user'
+            });
+        }
+    },
+    getAll: async (req, res) => {
+        try {
+            const users = await auth.getAll();
+
+            res.status(200).json(users);
+        } catch (e) {
+            helper.log(e.msg, e.label, 'red');
+            res.status(500).json({
+                msg: 'error getting all users'
+            });
+        }
     }
 }

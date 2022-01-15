@@ -37,5 +37,21 @@ module.exports = {
             });
         }
 
-    }
+    },
+    adminOnly: (req, res, next) => {
+        try {
+            if (req.payload.role !== 'admin') {
+                return res.status(401).json({
+                    error: 'unauthorized'
+                });
+            }
+    
+            next();
+        } catch (e) {
+            helper.log(pe.render(e), "ROUTE: /api/channel/adminOnly", "red");
+            res.status(401).json({
+                msg: 'unauthorized'
+            });
+        }
+    },
 };

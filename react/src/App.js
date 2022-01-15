@@ -62,6 +62,23 @@ import FiltersPage from "page/user/filter/Filters";
 import AddFilterPage from "page/user/filter/AddFilter";
 import EditFilterPage from "page/user/filter/EditFilter";
 
+// Admin -> Users
+import AdminManageUsersPage from "page/admin/user/Users";
+import AdminEditUserPage from "page/admin/user/EditUser";
+
+// Admin -> Channels
+import AdminManageChannelsPage from "page/admin/channel/Channels";
+
+// Admin -> API Keys
+import AdminManageKeysPage from "page/admin/keys/Keys";
+
+// Admin -> Webhooks
+import AdminManageWebhooksPage from "page/admin/webhook/Webhooks";
+
+// Admin -> Filters
+import AdminManageFiltersPage from "page/admin/filter/Filters";
+
+
 function Home() {
 	return (
 		<header className="App-header">
@@ -90,7 +107,8 @@ function App() {
 		setUser(user);
 	};
 
-	/* useEffect(() => {
+	/* useE
+	ffect(() => {
 		const localUser = localStorage.getItem("user");
 
 		if (localUser) {
@@ -138,18 +156,22 @@ function App() {
 						<Route path="/user/filters" element={<FiltersPage />} />
 						<Route path="/user/filters/add" element={<AddFilterPage />} />
 						<Route path="/user/filters/edit" element={<EditFilterPage />} />
-						{/* <Route path="inventory" element={<ManageInventoryPage />} />
-						<Route path="/user/inventory/add" element={<InventoryAddItemPage />} />
-						<Route path="/user/inventory/edit" element={<InventoryEditItemPage />} />
-						<Route path="/user/inventory/sell" element={<InventoryAddSoldPage />} />
-
-						<Route path="orders" element={<ManageOrderPage />} />
-						<Route path="report" element={<DisplayReportPage />} />
-						<Route path="accounts" element={<ManageAccountPage />} />
-						<Route path="approve" element={<ApproveOrderPage />} />
-						<Route path="add" element={<AddOrderPage />} />
-						<Route path="update" element={<UpdateOrderPage />} /> */}
-						{/* <Route path="tests" element={<TestPage />} /> */}
+						
+					</Route>
+					<Route path="/admin" element={<AdminLayout user={user}/>}>
+						<Route index element={<Home />} />
+						{/* Admin -> Users */}
+						<Route path="/admin/users" element={<AdminManageUsersPage />} />
+						<Route path="/admin/users/edit" element={<AdminEditUserPage />} />
+						{/* Admin -> Channels */}
+						<Route path="/admin/channels" element={<AdminManageChannelsPage />} />
+						{/* Admin -> API Keys */}
+						<Route path="/admin/keys" element={<AdminManageKeysPage />} />
+						{/* Admin -> Webhooks */}
+						<Route path="/admin/webhooks" element={<AdminManageWebhooksPage />} />
+						{/* Admin -> Filters */}
+						<Route path="/admin/filters" element={<AdminManageFiltersPage />} />
+						{/* <Route path="/admin/users/edit" element={<AdminEditUserPage />} /> */}
 					</Route>
 					{/* <Route path="/admin" element={<AdminLayout />}>
 						<Route index element={<Home />} />
