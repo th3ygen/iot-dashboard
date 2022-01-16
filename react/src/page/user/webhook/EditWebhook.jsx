@@ -53,7 +53,7 @@ function AddWebhookPage() {
 
 	const onChannelSelect = () => {
 		try {
-            const channel = channels.find((channel) => channel.id === channelRef.current.value);
+            const channel = channels.find((channel) => channel._id === channelRef.current.value);
 
             setFields(channel.fields);
 		} catch (e) {
@@ -79,7 +79,7 @@ function AddWebhookPage() {
                         res = await req.json();
 
                         setChannels(res.channels);
-                        setFields(res.channels[0].fields);
+                        
                     }
                 }
 			} catch (e) {
@@ -90,7 +90,7 @@ function AddWebhookPage() {
 
 	useEffect(() => {
 		(async () => {
-			if (location.state.id) {
+			if (location.state.id && user.token) {
 				try {
 					let res, req;
 
@@ -105,6 +105,8 @@ function AddWebhookPage() {
 					if (req.status === 200) {
 						res = await req.json();
 
+						console.log('wh', res);
+
 						labelRef.current.value = res.label;
 						urlRef.current.value = res.url;
 						channelRef.current.value = res.channelId;
@@ -112,6 +114,10 @@ function AddWebhookPage() {
 						triggerFieldRef.current.value = res.trigger.split(" ")[0];
 						triggerCompareRef.current.value = res.trigger.split(" ")[1];
 						triggerValueRef.current.value = res.trigger.split(" ")[2];
+
+						const selectedChannel = channels.find((channel) => channel._id === res.channelId);
+
+						setFields(selectedChannel.fields);
 					}
 				} catch (e) {
 					console.error(e);
@@ -119,7 +125,7 @@ function AddWebhookPage() {
 			}
 
 		})();
-	}, [location.state.id]);
+	}, [location.state.id, user.token]);
 
 	return (
 		<div className={styles.container}>

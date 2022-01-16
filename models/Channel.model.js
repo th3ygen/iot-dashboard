@@ -135,7 +135,10 @@ schema.statics.add = async (title, description, fields, dataRate, ownerId) => {
 	try {
 		let increment = 30 * 1000;
 
-		switch (channel.dataRate) {
+		switch (dataRate) {
+			case "10s":
+				increment = 10 * 1000;
+				break;
 			case "1m":
 				increment = 60 * 1000;
 				break;
