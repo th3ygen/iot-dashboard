@@ -38,8 +38,8 @@ function WebhooksPage() {
 								webhook._id,
 								webhook.label,
 								webhook.trigger,
-								webhook.lastStatus,
-								webhook.lastRequestMessage,
+								webhook.lastStatus || "",
+								webhook.lastRequestMessage || "",
 								`${
 									webhook.active ? "Active" : "Inactive"
 								}:#FFF`,
@@ -165,8 +165,8 @@ function WebhooksPage() {
 													webhook._id,
 													webhook.label,
 													webhook.trigger,
-													webhook.lastStatus,
-													webhook.lastRequestMessage,
+													webhook.lastStatus || "",
+													webhook.lastRequestMessage || "",
 													`${
 														webhook.active
 															? "Active"

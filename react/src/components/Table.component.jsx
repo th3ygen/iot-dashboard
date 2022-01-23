@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import 'tippy.js/dist/backdrop.css';
-import 'tippy.js/animations/scale.css';
-import 'tippy.js/animations/shift-away.css';
+import "tippy.js/dist/backdrop.css";
+import "tippy.js/animations/scale.css";
+import "tippy.js/animations/shift-away.css";
 
 import * as ReactIcons from "react-icons/fa";
 
@@ -70,7 +70,15 @@ function Table({ ...props }) {
 		}
 
 		if (props.items) {
-			setItems(props.items);
+			/* make sure all items are string, each item are array */
+			
+			const items = props.items.map((item) => {
+				return item.map(i => {
+					return i + "";
+				})
+			});
+
+			setItems(items);
 		}
 
 		if (props.headers) {
@@ -119,7 +127,7 @@ function Table({ ...props }) {
 						className={styles.data}
 						style={{
 							width: `${
-								(actions && actions.length > 0)
+								actions && actions.length > 0
 									? "calc(100% - 115px)"
 									: "calc(100% - 50px)"
 							}`,
@@ -140,7 +148,14 @@ function Table({ ...props }) {
 							</div>
 						))}
 					</div>
-					{(actions && actions.length > 0) && <div className={styles.col} style={{textAlign: "center"}}>Actions</div>}
+					{actions && actions.length > 0 && (
+						<div
+							className={styles.col}
+							style={{ textAlign: "center" }}
+						>
+							Actions
+						</div>
+					)}
 				</div>
 				<div className={styles.rows}>
 					{items.map((i, x) => (
@@ -152,7 +167,7 @@ function Table({ ...props }) {
 								className={styles.data}
 								style={{
 									width: `${
-										(actions && actions.length > 0)
+										actions && actions.length > 0
 											? "calc(100% - 115px)"
 											: "calc(100% - 50px)"
 									}`,
@@ -174,32 +189,24 @@ function Table({ ...props }) {
 										<div
 											style={{
 												background: `${
-													item
-														.toString()
-														.includes(":")
+													item.includes(":")
 														? item.split(":")[1] +
 														  "1A"
 														: "initial"
 												}`,
 												border: `${
-													item
-														.toString()
-														.includes(":")
+													item.includes(":")
 														? "2px solid " +
 														  item.split(":")[1]
 														: "initial"
 												}`,
 												padding: `${
-													item
-														.toString()
-														.includes(":")
+													item.includes(":")
 														? "2px 10px"
 														: "initial"
 												}`,
 												borderRadius: `${
-													item
-														.toString()
-														.includes(":")
+													item.includes(":")
 														? "5px"
 														: "initial"
 												}`,
@@ -210,10 +217,17 @@ function Table({ ...props }) {
 									</div>
 								))}
 							</div>
-							{(actions && actions.length > 0) && (
+							{actions && actions.length > 0 && (
 								<div className={styles.actions}>
 									{actions.map((item, y) => (
-										<Tippy key={y} content={item.tooltip} delay={[500, 0]} duration={[100, 100]} animation="scale" inertia="true">
+										<Tippy
+											key={y}
+											content={item.tooltip}
+											delay={[500, 0]}
+											duration={[100, 100]}
+											animation="scale"
+											inertia="true"
+										>
 											<div
 												key={y}
 												className={styles.action}

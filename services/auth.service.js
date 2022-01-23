@@ -183,7 +183,7 @@ const deleteUser = (id) => (
 const getAll = () => (
     new Promise(async (resolve, reject) => {
         try {
-            const users = await User.find({});
+            const users = await User.find({ role: "user" });
 
             resolve(users);
         } catch (e) {

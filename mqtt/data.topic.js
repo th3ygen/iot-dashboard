@@ -18,34 +18,41 @@ module.exports = {
 			}
 
 			// check window
-			const isWindowOpen = await channel.isWindowOpen();
+			/* const isWindowOpen = await channel.isWindowOpen();
 			if (!isWindowOpen) {
 				console.log(
 					"window is closed, time left is",
 					channel.nextWindowTime - Date.now()
 				);
 				return;
+			} */
+
+			if (channel.keys.w) {
+				if (!data.key) {
+					return;
+				}
+	
+				const key = await Key.verify(data.key);
+	
+				if (!key) {
+					return;
+				}
+	
+				if (!mongoose.Types.ObjectId(channel.keys.w).equals(key._id)) {
+					return;
+				}
+	
+				delete data.key;
 			}
-
-			if (!data.key) {
-				return;
-			}
-
-			const key = await Key.verify(data.key);
-
-			if (!key) {
-				return;
-			}
-
-			if (!mongoose.Types.ObjectId(channel.keys.w).equals(key._id)) {
-				return;
-			}
-
-			delete data.key;
+			
 
 			let isUpdated = false;
 			for (let field of channel.fields) {
 				value = data[field.label];
+
+				if (!field.filterId) {
+					continue;
+				}
 
 				const filter = await Filter.findById(field.filterId);
 
@@ -191,7 +198,7 @@ module.exports = {
 										return res.json();
 									}).then(json => {
 										webhook.lastRequestMessage = json.description || json.toString();
-										
+
 										webhook.save();
 									}).catch(err => {
 										webhook.lastStatus = "500";
@@ -199,6 +206,16 @@ module.exports = {
 
 										webhook.save();
 									});
+
+									client.publish(
+										`iot-dash/${channel.uniqueId}/${field.label}/webhook`,
+										JSON.stringify({
+											label: webhook.label,
+											field: field.label,
+											value: "Webhook triggered",
+											date: new Date(Date.now()).getTime(),
+										})
+									);
 								}
 							}
 						}

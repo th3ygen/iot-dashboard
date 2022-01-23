@@ -61,13 +61,27 @@ function AddWebhookPage() {
 		}
 	};
 
-	useEffect(() => {
+	/* useEffect(() => {
 		(async () => {
 			try {
                 if (user.token) {
                     let res, req;
 
-                    req = await fetch("http://localhost:8080/api/channel/owned", {
+                    
+                }
+			} catch (e) {
+				console.error(e);
+			}
+		})();
+	}, [user.token]); */
+
+	useEffect(() => {
+		(async () => {
+			if (location.state.id && user.token) {
+				try {
+					let res, req, channels;
+
+					req = await fetch("http://localhost:8080/api/channel/owned", {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
@@ -78,21 +92,10 @@ function AddWebhookPage() {
                     if (req.status === 200) {
                         res = await req.json();
 
+						channels = res.channels;
                         setChannels(res.channels);
                         
                     }
-                }
-			} catch (e) {
-				console.error(e);
-			}
-		})();
-	}, [user.token]);
-
-	useEffect(() => {
-		(async () => {
-			if (location.state.id && user.token) {
-				try {
-					let res, req;
 
 					req = await fetch(`http://localhost:8080/api/webhook/get/${location.state.id}`, {
 						method: "GET",
@@ -105,7 +108,7 @@ function AddWebhookPage() {
 					if (req.status === 200) {
 						res = await req.json();
 
-						console.log('wh', res);
+						console.log('wh', res.trigger.split(" ")[0]);
 
 						labelRef.current.value = res.label;
 						urlRef.current.value = res.url;
@@ -116,6 +119,7 @@ function AddWebhookPage() {
 						triggerValueRef.current.value = res.trigger.split(" ")[2];
 
 						const selectedChannel = channels.find((channel) => channel._id === res.channelId);
+						console.log('fields', selectedChannel);
 
 						setFields(selectedChannel.fields);
 					}

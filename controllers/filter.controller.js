@@ -4,6 +4,7 @@ const PrettyError = require("pretty-error");
 
 const pe = new PrettyError();
 
+const Channel = mongoose.model("Channel");
 const Filter = mongoose.model("Filter");
 const User = mongoose.model('User');
 
@@ -33,7 +34,7 @@ module.exports = {
     },
     create: async (req, res) => {
         try {
-            const { label, expression, fields } = req.body;
+            const { label, expression, testValues, fields } = req.body;
 
             if (!label || !expression) {
                 return res.status(400).json({
@@ -45,6 +46,7 @@ module.exports = {
                 label,
                 expression,
                 fields: fields || [],
+                testValues,
                 ownerId: req.payload.id,
             });
 
@@ -139,7 +141,7 @@ module.exports = {
     update: async (req, res) => {
         try {
             const { id } = req.body;
-            const { label, expression, fields } = req.body;
+            const { label, expression, fields, testValues } = req.body;
 
             const filter = await Filter.findById(id);
 
@@ -152,6 +154,7 @@ module.exports = {
             filter.label = label;
             filter.expression = expression;
             filter.fields = fields || [];
+            filter.testValues = testValues;
 
             await filter.save();
 
@@ -160,6 +163,50 @@ module.exports = {
             });
         } catch (e) {
             helper.log(pe.render(e), "ROUTE: /api/filter/update", "red");
+            res.status(500).json({
+                msg: e,
+            });
+        }
+    },
+    delete: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const filter = await Filter.findById(id);
+
+            if (!filter) {
+                return res.status(404).json({
+                    msg: 'filter not found'
+                });
+            }
+
+            /* find all channels that contains filter id at channel.fields.filterId */
+            const channels = await Channel.find({
+                fields: {
+                    $elemMatch: {
+                        filterId: id,
+                    },
+                },
+            });
+
+            /* delete filter from all channels */
+            for (const channel of channels) {
+                const index = channel.fields.findIndex((f) => f.filterId.equals(id));
+
+                if (index !== -1) {
+                    channel.fields[index].filterId = null;
+                }
+
+                await channel.save();
+            }
+
+            await filter.remove();
+
+            res.status(200).json({
+                msg: 'filter deleted'
+            });
+        } catch (e) {
+            helper.log(pe.render(e), "ROUTE: /api/filter/delete", "red");
             res.status(500).json({
                 msg: e,
             });

@@ -18,10 +18,11 @@ import {
 function ViewChannel() {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const [user, setUser] = useOutletContext();
-	const { message, connectionStatus } = useSubscription(
-		"iot-dash/+/+/update"
-	);
+	const [user, setUser, message] = useOutletContext();
+	/* const { message, connectionStatus } = useSubscription(
+		"iot-dash/+/+/update",
+		"test"
+	); */
 
 	const [fields, setFields] = useState([]);
 	const [data, setData] = useState({});
@@ -33,6 +34,8 @@ function ViewChannel() {
 	const [totalComments, setTotalComments] = useState(0);
 	const [totalViews, setTotalViews] = useState(0);
 	const [id, setId] = useState("");
+
+	const [refresh, setRefresh] = useState(false);
 
 	const commentRef = useRef();
 	const logRef = useRef({});
@@ -51,8 +54,7 @@ function ViewChannel() {
 			);
 
 			if (req.status === 200) {
-				// refresh the page using react router
-				navigate(0);
+				setRefresh(!refresh);
 			}
 		} catch (e) {
 			console.error(e);
@@ -80,8 +82,7 @@ function ViewChannel() {
 				);
 
 				if (req.status === 200) {
-					// refresh the page using react router
-					navigate(0);
+					setRefresh(!refresh);
 
 					// smooth scroll to bottom
 					commentRef.scrollTop = commentRef.scrollHeight;
@@ -111,8 +112,6 @@ function ViewChannel() {
 				}
 			);
 
-			console.log(req);
-
 			if (req.status === 200) {
 				setVisible(!visible);
 			}
@@ -121,47 +120,76 @@ function ViewChannel() {
 		}
 	};
 
+	/* useEffect(() => {
+		if (message) {
+			console.log(message);
+		}
+	}, [message]); */
+
 	useEffect(() => {
-		console.log(connectionStatus);
 		try {
-			if (connectionStatus === "Connected" && id !== "") {
+			if (id !== "") {
 				if (message) {
 					const topic = message.topic.split("/");
 					const body = JSON.parse(message.message);
 
 					if (topic[1] === id) {
-						const newData = { ...data };
-						if (newData[topic[2]]) {
-							newData[topic[2]].push(body);
-						} else {
-							newData[topic[2]] = [body];
+						if (topic[3] === "update") {
+							const newData = { ...data };
+							if (newData[topic[2]]) {
+								newData[topic[2]].push(body);
+							} else {
+								newData[topic[2]] = [body];
+							}
+
+							const newLog = [...log];
+
+							// convert data.date to date string
+							// hh:mm:ss, Month DD
+							const dateStr = new Date(
+								body.date
+							).toLocaleString();
+							const date = dateStr.split(",")[0];
+							const month = dateStr.split(",")[1];
+
+							newLog.push([
+								body.channel,
+								body.field,
+								body.value,
+								`${date}, ${month}`,
+							]);
+
+							setLog(newLog);
+
+							setData(newData);
 						}
 
-						const newLog = [...log];
-
-						// convert data.date to date string
-						// hh:mm:ss, Month DD
-						const dateStr = new Date(body.date).toLocaleString();
-						const date = dateStr.split(",")[0];
-						const month = dateStr.split(",")[1];
-
-						newLog.push([
-							body.channel,
-							body.field,
-							body.value,
-							`${date}, ${month}`,
-						]);
-
-						setLog(newLog);
-
-						setData(newData);
+						if (topic[3] === "webhook") {
+							// convert data.date to date string
+							// hh:mm:ss, Month DD
+							const dateStr = new Date(body.date).toLocaleString();
+							const date = dateStr.split(",")[0];
+							const month = dateStr.split(",")[1];
+	
+							const newLog = [...log];
+	
+							newLog.push([
+								body.label,
+								body.field,
+								body.value,
+								`${date}, ${month}`,
+							]);
+	
+							setLog(newLog);
+						}
 					}
+
 				}
 			}
 		} catch (e) {
 			console.log(e);
 		}
-	}, [message, connectionStatus, id]);
+	}, [message, id]);
 
 	useEffect(() => {
 		if (logRef.current) {
@@ -302,7 +330,7 @@ function ViewChannel() {
 				}
 			}
 		})();
-	}, [location.state.id]);
+	}, [location.state.id, refresh]);
 
 	return (
 		<div className="container">
@@ -401,8 +429,8 @@ function ViewChannel() {
 						<div className={styles.headers}>
 							<div className={styles.header}>Source</div>
 							<div className={styles.header}>Field</div>
-							<div className={styles.header}>Timestamp</div>
 							<div className={styles.header}>Data</div>
+							<div className={styles.header}>Timestamp</div>
 						</div>
 						<div className={styles.list} ref={logRef}>
 							{log.map((item, index) => (
@@ -424,12 +452,12 @@ function ViewChannel() {
 						{comments.map((item, index) => (
 							<div key={index} className={styles.comment}>
 								<div className={styles.user}>
-									<div className={styles.avatar}
-									>
+									<div className={styles.avatar}>
 										{item.commentor.username[0]}
 									</div>
 									<div className={styles.name}>
-										{(item.isOwner && 'You') || item.commentor.username}
+										{(item.isOwner && "You") ||
+											item.commentor.username}
 									</div>
 								</div>
 								<div className={styles.content}>

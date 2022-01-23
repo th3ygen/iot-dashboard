@@ -66,7 +66,7 @@ function AddDevicePage() {
 
 			const result = parser.evaluate(variables);
 
-            let out = `RESULT\n\nVariables: ${parser.variables().join(', ')}\n${str}\n=${result}`;
+            let out = `RESULT\n\nVariables:\n${parser.variables().join(', ')}\n\n=${result}`;
 
 			resultRef.current.value = out;
 		} catch (e) {
@@ -118,6 +118,10 @@ function AddDevicePage() {
                     label: filterNameRef.current.value,
                     expression: exprRef.current.value,
                     fields,
+					testValues: vars.map(v => ({
+						label: v.name,
+						value: v.value,
+					})),
                     ownderId: user.id,
                 })
             })

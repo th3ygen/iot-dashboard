@@ -12,13 +12,15 @@ export default function UserLayout(props) {
 	const navigate = useNavigate();
 
 	const [user, setUser] = useState({});
+	const [mqttClient, setMqttClient] = useState(null);
+	const [message, setMessage] = useState(null);
 
 	const paths = [
-		{
+		/* {
 			path: "/user/inventory",
 			name: "Dashboard",
 			icon: "FaThList",
-		},
+		}, */
 		{
 			path: "/user/browse",
 			name: "Browse",
@@ -54,11 +56,11 @@ export default function UserLayout(props) {
 			name: "Analytics",
 			icon: "FaChartBar",
 		}, */
-		{
+		/* {
 			path: "/user/account",
 			name: "Account",
 			icon: "FaUserCog",
-		},
+		}, */
 	];
 
 	useEffect(() => {
@@ -70,7 +72,7 @@ export default function UserLayout(props) {
 			setUser(localUser);
 
 			if (localUser.role === "admin") {
-				navigate("/admin", {
+				navigate("/admin/users", {
 					replace: true,
 				});
 			}
@@ -79,12 +81,25 @@ export default function UserLayout(props) {
 		}
 	}, []);
 
+	useEffect(() => {
+		if (props.mqtt) {
+			setMqttClient(props.mqtt);
+
+			props.mqtt.on("message", (topic, message) => {
+				setMessage({
+					topic,
+					message: message.toString(),
+				});
+			});
+		}
+	}, [props.mqtt])
+
 	return (
 		<div>
 			<Topbar context={[user, setUser]}/>
 			<Navbar paths={paths} username={user.username || "Loading..."} title={user.title || "Loading..."} />
 			<div className={styles.content}>
-				<Outlet context={[user, setUser]}/>
+				<Outlet context={[user, setUser, message]}/>
 			</div>
 		</div>
 	);

@@ -87,6 +87,7 @@ module.exports = {
     getOwned: async (req, res) => {
         try {
             const webhooks = await Webhook.find({ owner: req.params.id });
+
             res.status(200).json(webhooks);
         } catch (err) {
             console.log(pe.render(err));

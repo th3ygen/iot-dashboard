@@ -15,5 +15,7 @@ router.get('/id/:id', middleware.auth.verifyJWT, controller.getById);
 router.patch('/updatetest/:id', middleware.auth.verifyJWT, controller.updateTest);
 router.patch('/update', middleware.auth.verifyJWT, controller.update);
 
+router.delete('/delete/:id', middleware.auth.verifyJWT, controller.delete);
+
 
 module.exports = router;

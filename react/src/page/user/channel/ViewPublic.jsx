@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useOutletContext, useNavigate } from "react-router-dom";
-import { useSubscription } from "mqtt-react-hooks";
+/* import { useSubscription } from "mqtt-react-hooks"; */
 import Tippy from "@tippyjs/react";
 
 import PageHeader from "components/PageHeader.component";
@@ -21,11 +21,11 @@ import {
 function ViewChannel() {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { message, connectionStatus } = useSubscription(
+	/* const { message, connectionStatus } = useSubscription(
 		"iot-dash/+/+/update"
-	);
+	); */
 
-	const [user, setUser] = useOutletContext();
+	const [user, setUser, message] = useOutletContext();
 
 	const [channel, setChannel] = useState({});
 	const [data, setData] = useState([]);
@@ -264,46 +264,47 @@ function ViewChannel() {
 	}, []);
 
 	useEffect(() => {
-		console.log(connectionStatus);
 		try {
-			if (connectionStatus === "Connected" && id !== "") {
+			if (id !== "") {
 				if (message) {
 					const topic = message.topic.split("/");
 					const body = JSON.parse(message.message);
 
 					if (topic[1] === id) {
-						const newData = { ...data };
-						if (newData[topic[2]]) {
-							newData[topic[2]].push(body);
-						} else {
-							newData[topic[2]] = [body];
+						if (topic[3] === 'update') {
+							const newData = { ...data };
+							if (newData[topic[2]]) {
+								newData[topic[2]].push(body);
+							} else {
+								newData[topic[2]] = [body];
+							}
+	
+							const newLog = [...log];
+	
+							// convert data.date to date string
+							// hh:mm:ss, Month DD
+							const dateStr = new Date(body.date).toLocaleString();
+							const date = dateStr.split(",")[0];
+							const month = dateStr.split(",")[1];
+	
+							newLog.push([
+								body.channel,
+								body.field,
+								body.value,
+								`${date}, ${month}`,
+							]);
+	
+							setLog(newLog);
+	
+							setData(newData);
 						}
-
-						const newLog = [...log];
-
-						// convert data.date to date string
-						// hh:mm:ss, Month DD
-						const dateStr = new Date(body.date).toLocaleString();
-						const date = dateStr.split(",")[0];
-						const month = dateStr.split(",")[1];
-
-						newLog.push([
-							body.channel,
-							body.field,
-							body.value,
-							`${date}, ${month}`,
-						]);
-
-						setLog(newLog);
-
-						setData(newData);
 					}
 				}
 			}
 		} catch (e) {
 			console.log(e);
 		}
-	}, [message, connectionStatus, id]);
+	}, [message, id]);
 
 	useEffect(() => {
 		(async () => {
@@ -444,7 +445,7 @@ function ViewChannel() {
 							<DateAxisLineChart
 								title={field}
 								label={`${field}${index}`}
-								data={data[field]}
+								data={data[field] || []}
 								height="250px"
 								stepped={false}
 							/>

@@ -35,11 +35,11 @@ function Login(props) {
 				})
 
                 if (res.role === "admin") {
-                    navigate("/admin", {
+                    navigate("/admin/users", {
                         replace: true,
                     });
                 } else {
-                    navigate("/user", {
+                    navigate("/user/browse", {
                         replace: true,
                     });
                 }
@@ -74,6 +74,11 @@ function Login(props) {
 							<input
 								type="password"
 								placeholder="Password"
+								onKeyPress={(e) => {
+									if (e.key === "Enter") {
+										login();
+									}
+								}}
 								ref={passwordRef}
 							/>
 						</div>

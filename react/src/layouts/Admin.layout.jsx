@@ -54,7 +54,7 @@ export default function AdminLayout() {
 			setUser(localUser);
 
 			if (localUser.role !== "admin") {
-				navigate("/user", {
+				navigate("/user/browse", {
 					replace: true,
 				});
 			}
