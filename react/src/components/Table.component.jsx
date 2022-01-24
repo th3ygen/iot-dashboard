@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
-import "tippy.js/dist/backdrop.css";
-import "tippy.js/animations/scale.css";
-import "tippy.js/animations/shift-away.css";
 
 import * as ReactIcons from "react-icons/fa";
 

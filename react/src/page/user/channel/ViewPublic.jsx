@@ -9,13 +9,17 @@ import FolderCard from "components/FolderCard";
 
 import styles from "styles/user/channel/View.module.scss";
 import {
+	FaBox,
+	FaBoxOpen,
 	FaClock,
 	FaComment,
 	FaCrown,
 	FaEye,
 	FaHeart,
+	FaKey,
 	FaPaperPlane,
 	FaTrashAlt,
+	FaUnlock,
 } from "react-icons/fa";
 
 function ViewChannel() {
@@ -37,6 +41,8 @@ function ViewChannel() {
 	const [totalViews, setTotalViews] = useState(0);
 	const [id, setId] = useState("");
 	const [ownerId, setOwnerId] = useState("");
+	const [keyR, setKeyR] = useState(false);
+	const [keyW, setKeyW] = useState(false);
 
 	const logRef = useRef({});
 	const commentRef = useRef({});
@@ -181,6 +187,10 @@ function ViewChannel() {
 
 					tViews = res.views || 0;
 
+					if (res.keys.r) {
+						setKeyR(true);
+					}
+
 					oId = res.ownerId;
 					setOwnerId(oId);
 					setChannel(res);
@@ -252,8 +262,6 @@ function ViewChannel() {
 									/(https?:\/\/[^\s]+)/g,
 									'<a href="$1" target="_blank">$1</a>'
 								);
-
-								console.log(comment);
 							}
 
 							c.comment = comment;
@@ -448,6 +456,71 @@ function ViewChannel() {
 										</div>
 									</div>
 								</Tippy>
+							</div>
+						</div>
+					</div>
+				</FolderCard>
+
+				<FolderCard title="Export">
+					<div className={styles.info}>
+						<div className={styles.col}>
+							<div className={styles.item}>
+								<div className={styles.label}>Get JSON</div>
+								<div className={styles.value}>
+									<div className={styles.request}>
+										<Tippy
+											key={123}
+											content={keyR ? "Requires API key" : "No API key required"}
+											delay={[500, 0]}
+											duration={[100, 100]}
+											animation="scale"
+											inertia="true"
+										>
+											<div className={styles.keys}>
+												{keyR ? (
+													<FaKey />
+
+												) : (
+													<FaUnlock />
+												)}
+											</div>
+										</Tippy>
+										<div className={styles.method}>GET</div>
+										<div className={styles.url}>
+											http://localhost:8080/api/channel/export/json/
+											{id}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className={styles.item}>
+								<div className={styles.label}>Get CSV</div>
+								<div className={styles.value}>
+									<div className={styles.request}>
+										<Tippy
+											key={123}
+											content={keyR ? "Requires API key" : "No API key required"}
+											delay={[500, 0]}
+											duration={[100, 100]}
+											animation="scale"
+											inertia="true"
+										>
+											<div className={styles.keys}>
+												{keyR ? (
+													<FaKey />
+
+												) : (
+													<FaUnlock />
+												)}
+											</div>
+										</Tippy>
+										<div className={styles.method}>GET</div>
+										<div className={styles.url}>
+											http://localhost:8080/api/channel/export/csv/
+											{id}
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

@@ -8,6 +8,7 @@ const Channel = require("../models/channel.model");
 const Data = require("../models/data.model");
 const User = require("../models/user.model");
 const Comment = require("../models/Comment.model");
+const Key = require("../models/key.model");
 
 module.exports = {
 	list: async (req, res) => {
@@ -671,4 +672,156 @@ module.exports = {
 			});
 		}
 	},
+	exportCSV: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			let channel;
+
+			if (mongoose.Types.ObjectId.isValid(id)) {
+				channel = await Channel.findById(id);
+			} else {
+				channel = await Channel.findOne({ uniqueId: id });
+			}
+
+			if (!channel) {
+				return res.status(404).json({
+					msg: "channel not found",
+				});
+			}
+
+			if (channel.keys.r) {
+				if (!req.headers.authorization) {
+					return res.status(401).json({
+						msg: "unauthorized",
+					});
+				}
+
+				const key = await Key.verify(req.headers.authorization.split(" ")[1]);
+
+				if (!key) {
+					return res.status(401).json({
+						msg: "unauthorized",
+					});
+				}
+
+				if (!mongoose.Types.ObjectId(channel.keys.r).equals(key)) {
+					return res.status(401).json({
+						msg: "unauthorized",
+					});
+				}
+			}
+
+			const data = await Data.find({ channelId: channel._id })
+
+			const result = {};
+
+			for (const item of data) {
+				if (result[item.fieldName]) {
+					result[item.fieldName].push({
+						value: item.value,
+						timestamp: new Date(item.createdAt).getTime()
+					});
+				} else {
+					result[item.fieldName] = [{
+						value: item.value,
+						timestamp: new Date(item.createdAt).getTime()
+					}];
+				}
+			}
+
+			// convert to csv, without using json2csv
+			const fields = Object.keys(result);
+
+			let rows = '';
+
+			for (const field of fields) {
+				for (const item of result[field]) {
+					rows += `${field},${item.value},${item.timestamp}\n`;
+				}
+			}
+
+			const header = "field,value,timestamp\n"
+
+			const csv = header + rows;
+
+			res.setHeader("Content-disposition", "attachment; filename=data.csv");
+			res.setHeader("Content-type", "text/csv");
+			res.status(200).send(csv);
+			/* res.status(200).json(result); */
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/exportCSV", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	},
+	exportJson: async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			let channel;
+
+			if (mongoose.Types.ObjectId.isValid(id)) {
+				channel = await Channel.findById(id);
+			} else {
+				channel = await Channel.findOne({ uniqueId: id });
+			}
+
+			if (!channel) {
+				return res.status(404).json({
+					msg: "channel not found",
+				});
+			}
+
+			if (channel.keys.r) {
+				if (!req.headers.authorization) {
+					return res.status(401).json({
+						msg: "unauthorized",
+					});
+				}
+
+				const key = await Key.verify(req.headers.authorization.split(" ")[1]);
+
+				if (!key) {
+					return res.status(401).json({
+						msg: "unauthorized",
+					});
+				}
+
+				if (!mongoose.Types.ObjectId(channel.keys.r).equals(key)) {
+					return res.status(401).json({
+						msg: "unauthorized",
+					});
+				}
+			}
+
+			const data = await Data.find({ channelId: channel._id })
+
+			const result = {};
+
+			for (const item of data) {
+				if (result[item.fieldName]) {
+					result[item.fieldName].push({
+						value: item.value,
+						timestamp: new Date(item.createdAt).getTime()
+					});
+				} else {
+					result[item.fieldName] = [{
+						value: item.value,
+						timestamp: new Date(item.createdAt).getTime()
+					}];
+				}
+			}
+
+			res.setHeader("Content-disposition", "attachment; filename=data.json");
+			res.setHeader("Content-type", "application/json");
+			res.status(200).send(JSON.stringify(result));
+		} catch (e) {
+			helper.log(e, "ROUTE: /api/channel/exportDataToJSON", "red");
+			res.status(500).json({
+				msg: e,
+			});
+		}
+	}
 };

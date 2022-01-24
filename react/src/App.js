@@ -7,6 +7,11 @@ import logo from "./logo.svg";
 import "styles/App.module.scss";
 import "alertifyjs/build/css/alertify.min.css";
 
+import "tippy.js/dist/tippy.css";
+import "tippy.js/dist/backdrop.css";
+import "tippy.js/animations/scale.css";
+import "tippy.js/animations/shift-away.css";
+
 import UserLayout from "layouts/User.layout";
 import AdminLayout from "layouts/Admin.layout";
 

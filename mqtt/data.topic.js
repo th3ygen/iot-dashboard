@@ -38,7 +38,7 @@ module.exports = {
 					return;
 				}
 	
-				if (!mongoose.Types.ObjectId(channel.keys.w).equals(key._id)) {
+				if (!mongoose.Types.ObjectId(channel.keys.w).equals(key)) {
 					return;
 				}
 	

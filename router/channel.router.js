@@ -38,4 +38,7 @@ router.post('/comment/:id', middleware.jwt.verifyJWT, controller.channel.addComm
 router.get('/comments/:id', controller.channel.getComments);
 router.delete('/comment/:id', middleware.jwt.verifyJWT, controller.channel.deleteComment);
 
+router.get('/export/csv/:id', controller.channel.exportCSV);
+router.get('/export/json/:id', controller.channel.exportJson);
+
 module.exports = router;

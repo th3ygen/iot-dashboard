@@ -2,6 +2,8 @@ import { useLocation, useOutletContext, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useSubscription, useMqttState } from "mqtt-react-hooks";
 
+import Tippy from "@tippyjs/react";
+
 import PageHeader from "components/PageHeader.component";
 import DateAxisLineChart from "components/DateAxisLineChart.component";
 import FolderCard from "components/FolderCard";
@@ -11,8 +13,10 @@ import {
 	FaClock,
 	FaEye,
 	FaEyeSlash,
+	FaKey,
 	FaPaperPlane,
 	FaTrashAlt,
+	FaUnlock,
 } from "react-icons/fa";
 
 function ViewChannel() {
@@ -34,6 +38,8 @@ function ViewChannel() {
 	const [totalComments, setTotalComments] = useState(0);
 	const [totalViews, setTotalViews] = useState(0);
 	const [id, setId] = useState("");
+	const [keyR, setKeyR] = useState(false);
+	const [keyW, setKeyW] = useState(false);
 
 	const [refresh, setRefresh] = useState(false);
 
@@ -269,6 +275,10 @@ function ViewChannel() {
 
 					tViews = res.views || 0;
 
+					if (res.keys.r) {
+						setKeyR(true);
+					}
+
 					ownerId = res.ownerId;
 					setChannel(res);
 				}
@@ -422,6 +432,71 @@ function ViewChannel() {
 										Unhide channel
 									</div>
 								)}
+							</div>
+						</div>
+					</div>
+				</FolderCard>
+
+				<FolderCard title="Export">
+					<div className={styles.info}>
+						<div className={styles.col}>
+							<div className={styles.item}>
+								<div className={styles.label}>Get JSON</div>
+								<div className={styles.value}>
+									<div className={styles.request}>
+										<Tippy
+											key={123}
+											content={keyR ? "Requires API key" : "No API key required"}
+											delay={[500, 0]}
+											duration={[100, 100]}
+											animation="scale"
+											inertia="true"
+										>
+											<div className={styles.keys}>
+												{keyR ? (
+													<FaKey />
+
+												) : (
+													<FaUnlock />
+												)}
+											</div>
+										</Tippy>
+										<div className={styles.method}>GET</div>
+										<div className={styles.url}>
+											http://localhost:8080/api/channel/export/json/
+											{id}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className={styles.item}>
+								<div className={styles.label}>Get CSV</div>
+								<div className={styles.value}>
+									<div className={styles.request}>
+										<Tippy
+											key={123}
+											content={keyR ? "Requires API key" : "No API key required"}
+											delay={[500, 0]}
+											duration={[100, 100]}
+											animation="scale"
+											inertia="true"
+										>
+											<div className={styles.keys}>
+												{keyR ? (
+													<FaKey />
+
+												) : (
+													<FaUnlock />
+												)}
+											</div>
+										</Tippy>
+										<div className={styles.method}>GET</div>
+										<div className={styles.url}>
+											http://localhost:8080/api/channel/export/csv/
+											{id}
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

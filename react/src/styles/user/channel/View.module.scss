@@ -35,7 +35,7 @@
 			gap: 20px;
 
 			.label {
-				flex: 1 1 150px;
+				flex: 0 0 100px;
 
 				display: flex;
 				align-items: center;
@@ -150,10 +150,9 @@
 
 		gap: 20px;
 
-
 		padding: 20px;
 
-		background:#161524;
+		background: #161524;
 
 		margin-bottom: 20px;
 
@@ -249,7 +248,7 @@
 
 				opacity: 0;
 
-				transition: .3s all;
+				transition: 0.3s all;
 			}
 		}
 	}
@@ -293,5 +292,36 @@
 				color: #7c7c7c;
 			}
 		}
+	}
+}
+
+.request {
+	background: #161524;
+
+	padding: 8px 14px;
+
+	border-radius: 6px;
+
+	display: flex;
+	gap: 10px;
+
+	align-items: center;
+
+	.keys {
+		height: auto;
+
+		display: flex;
+
+		align-items: center;
+
+		margin-right: 5px;
+
+		color: #2179ff;
+	}
+
+	.method {
+		font-size: 14px;
+		font-weight: 700;
+		color: #ffffff;
 	}
 }
