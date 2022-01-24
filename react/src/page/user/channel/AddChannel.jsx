@@ -30,10 +30,6 @@ function AddChannelPage() {
 	};
 
 	const addField = () => {
-		console.log(
-			color[dataTypeInput.current.value],
-			dataTypeInput.current.value
-		);
 
 		if (fieldNameInput.current.value.length > 0) {
 			if (fields.indexOf(fieldNameInput.current.value) === -1) {
@@ -73,7 +69,7 @@ function AddChannelPage() {
 		);
 
 		if (request.status === 200) {
-			navigate("/user/channels", { replace: true });
+			navigate(-1);
 		}
 	};
 

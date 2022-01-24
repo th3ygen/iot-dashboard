@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useOutletContext, useNavigate, useLocation } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { FaPlus, FaUserCheck } from "react-icons/fa";
 import Tippy from "@tippyjs/react";
 
@@ -11,11 +11,10 @@ import "tippy.js/dist/backdrop.css";
 import "tippy.js/animations/scale.css";
 import "tippy.js/animations/shift-away.css";
 
-function EditUserPage() {
+function CreateUserPage() {
 	const [user, setUser, message] = useOutletContext();
 
 	const navigate = useNavigate();
-	const location = useLocation();
 
 	const usernameRef = useRef();
 	const emailRef = useRef();
@@ -23,11 +22,11 @@ function EditUserPage() {
 	const occupationRef = useRef();
 	const roleRef = useRef();
 
-	const edit = async () => {
+	const create = async () => {
 		const request = await fetch(
-			"http://localhost:8080/api/auth/user/"+location.state.id,
+			"http://localhost:8080/api/auth/create",
 			{
-				method: "PATCH",
+				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					auth: user.token,
@@ -48,40 +47,11 @@ function EditUserPage() {
 
 	};
 
-	useEffect(() => {
-		(async () => {
-			if (location.state) {
-				if (location.state.id) {
-					const request = await fetch(
-						`http://localhost:8080/api/auth/user/${location.state.id}`,
-						{
-							method: "GET",
-							headers: {
-								"Content-Type": "application/json",
-								auth: user.token,
-							},
-						});
-
-					if (request.status === 200) {
-						const data = await request.json();
-
-						usernameRef.current.value = data.username;
-						emailRef.current.value = data.email;
-						occupationRef.current.value = data.title;
-						roleRef.current.value = data.role;
-					}
-
-				}	
-			}
-
-		})();
-	}, [location.state])
-
 	return (
 		<div className={styles.container}>
 			<PageHeader
-				title="Edit user"
-				brief="Edit a user, you may change their role."
+				title="Create new user"
+				brief="Create a new user, you may assign them as a system administrator."
 				navs={[
 					{
 						name: "Users",
@@ -123,8 +93,8 @@ function EditUserPage() {
 					</div>
 
 					<div className={`${styles.item} ${styles.addBtn}`}>
-						<div className="neon-btn" onClick={edit}>
-							<FaPlus /> <span>Update user</span>
+						<div className="neon-btn" onClick={create}>
+							<FaPlus /> <span>Create user</span>
 						</div>
 					</div>
 				</div>
@@ -133,4 +103,4 @@ function EditUserPage() {
 	);
 }
 
-export default EditUserPage;
+export default CreateUserPage;

@@ -13,4 +13,8 @@ router.delete('/delete/:id', [middleware.auth.verifyJWT, middleware.auth.adminOn
 
 router.get('/list', [middleware.auth.verifyJWT, middleware.auth.adminOnly], controller.auth.getAll);
 
+router.post('/create', [middleware.auth.verifyJWT, middleware.auth.adminOnly], controller.auth.create);
+router.get('/user/:id', [middleware.auth.verifyJWT, middleware.auth.adminOnly], controller.auth.get);
+router.patch('/user/:id', [middleware.auth.verifyJWT, middleware.auth.adminOnly], controller.auth.update);
+
 module.exports = router;

@@ -96,7 +96,6 @@ function ViewChannel() {
 							})
 						);
 					}
-
 				}
 			}
 		} catch (e) {
@@ -246,6 +245,19 @@ function ViewChannel() {
 							});
 							const day = date.getDate();
 
+							let comment = c.comment;
+
+							if (comment.includes("http")) {
+								comment = comment.replace(
+									/(https?:\/\/[^\s]+)/g,
+									'<a href="$1" target="_blank">$1</a>'
+								);
+
+								console.log(comment);
+							}
+
+							c.comment = comment;
+
 							return {
 								...c,
 								createdAt: `${time}, ${month} ${day}`,
@@ -271,31 +283,33 @@ function ViewChannel() {
 					const body = JSON.parse(message.message);
 
 					if (topic[1] === id) {
-						if (topic[3] === 'update') {
+						if (topic[3] === "update") {
 							const newData = { ...data };
 							if (newData[topic[2]]) {
 								newData[topic[2]].push(body);
 							} else {
 								newData[topic[2]] = [body];
 							}
-	
+
 							const newLog = [...log];
-	
+
 							// convert data.date to date string
 							// hh:mm:ss, Month DD
-							const dateStr = new Date(body.date).toLocaleString();
+							const dateStr = new Date(
+								body.date
+							).toLocaleString();
 							const date = dateStr.split(",")[0];
 							const month = dateStr.split(",")[1];
-	
+
 							newLog.push([
 								body.channel,
 								body.field,
 								body.value,
 								`${date}, ${month}`,
 							]);
-	
+
 							setLog(newLog);
-	
+
 							setData(newData);
 						}
 					}
@@ -509,7 +523,11 @@ function ViewChannel() {
 									)}
 								</div>
 								<div className={styles.content}>
-									{item.comment}
+									<div
+										dangerouslySetInnerHTML={{
+											__html: item.comment,
+										}}
+									/>
 								</div>
 								<div className={styles.date}>
 									<FaClock style={{ color: "#2179ff" }} />

@@ -58,7 +58,7 @@ function UsersPage() {
 				navs={[
 					{
 						name: "Create filter",
-						path: "/user/webhooks/add",
+						path: "/admin/filters/add",
 						icon: "FaPlus",
 					},
 				]}
@@ -75,7 +75,7 @@ function UsersPage() {
 							tooltip: "Edit",
 							icon: "FaEdit",
 							callback: async (id) => {
-                                navigate('/admin/users/edit', { state: { id } });
+                                navigate('/admin/filters/edit', { state: { id } });
                             },
 						},
 						{

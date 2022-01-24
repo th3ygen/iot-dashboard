@@ -167,23 +167,24 @@ function ViewChannel() {
 						if (topic[3] === "webhook") {
 							// convert data.date to date string
 							// hh:mm:ss, Month DD
-							const dateStr = new Date(body.date).toLocaleString();
+							const dateStr = new Date(
+								body.date
+							).toLocaleString();
 							const date = dateStr.split(",")[0];
 							const month = dateStr.split(",")[1];
-	
+
 							const newLog = [...log];
-	
+
 							newLog.push([
 								body.label,
 								body.field,
 								body.value,
 								`${date}, ${month}`,
 							]);
-	
+
 							setLog(newLog);
 						}
 					}
-
 				}
 			}
 		} catch (e) {
@@ -320,6 +321,22 @@ function ViewChannel() {
 							});
 							const day = date.getDate();
 
+							/* modify the comment string
+								if theres a link, wrap it in a <a> tag
+							*/
+							let comment = c.comment;
+
+							if (comment.includes("http")) {
+								comment = comment.replace(
+									/(https?:\/\/[^\s]+)/g,
+									'<a href="$1" target="_blank">$1</a>'
+								);
+
+								console.log(comment);
+							}
+
+							c.comment = comment;
+
 							return {
 								...c,
 								createdAt: `${time}, ${month} ${day}`,
@@ -416,7 +433,7 @@ function ViewChannel() {
 							<DateAxisLineChart
 								title={field}
 								label={`${field}${index}`}
-								data={data[field]}
+								data={data[field] || []}
 								height="250px"
 								stepped={false}
 							/>
@@ -461,7 +478,11 @@ function ViewChannel() {
 									</div>
 								</div>
 								<div className={styles.content}>
-									{item.comment}
+									<div
+										dangerouslySetInnerHTML={{
+											__html: item.comment,
+										}}
+									/>
 								</div>
 								<div className={styles.date}>
 									<FaClock style={{ color: "#2179ff" }} />

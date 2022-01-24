@@ -3,7 +3,9 @@ import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Connector, useMqttState } from "mqtt-react-hooks";
 import * as mqtt from "mqtt";
 import logo from "./logo.svg";
+
 import "styles/App.module.scss";
+import "alertifyjs/build/css/alertify.min.css";
 
 import UserLayout from "layouts/User.layout";
 import AdminLayout from "layouts/Admin.layout";
@@ -65,6 +67,7 @@ import EditFilterPage from "page/user/filter/EditFilter";
 
 // Admin -> Users
 import AdminManageUsersPage from "page/admin/user/Users";
+import AdminCreateUserPage from "page/admin/user/CreateUser";
 import AdminEditUserPage from "page/admin/user/EditUser";
 
 // Admin -> Channels
@@ -257,6 +260,10 @@ function App() {
 						element={<AdminManageUsersPage />}
 					/>
 					<Route
+						path="/admin/users/create"
+						element={<AdminCreateUserPage />}
+					/>
+					<Route
 						path="/admin/users/edit"
 						element={<AdminEditUserPage />}
 					/>
@@ -265,10 +272,22 @@ function App() {
 						path="/admin/channels"
 						element={<AdminManageChannelsPage />}
 					/>
+					<Route
+						path="/admin/channels/add"
+						element={<AddChannelPage />}
+					/>
+					<Route
+						path="/admin/channels/edit"
+						element={<EditChannelPage />}
+					/>
 					{/* Admin -> API Keys */}
 					<Route
 						path="/admin/keys"
 						element={<AdminManageKeysPage />}
+					/>
+					<Route
+						path="/admin/apiKeys/add"
+						element={<AddApiKeyPage />}
 					/>
 					{/* Admin -> Webhooks */}
 					<Route
@@ -279,6 +298,14 @@ function App() {
 					<Route
 						path="/admin/filters"
 						element={<AdminManageFiltersPage />}
+					/>
+					<Route
+						path="/admin/filters/add"
+						element={<AddFilterPage />}
+					/>
+					<Route
+						path="/admin/filters/edit"
+						element={<EditFilterPage />}
 					/>
 					{/* <Route path="/admin/users/edit" element={<AdminEditUserPage />} /> */}
 				</Route>

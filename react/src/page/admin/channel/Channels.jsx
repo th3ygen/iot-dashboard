@@ -26,8 +26,6 @@ function UsersPage() {
 				if (req.status === 200) {
 					const res = await req.json();
 
-					console.log(res);
-
 					setChannels(
 						res.map((channel) => {
 							// convert createdAt to a date string
@@ -59,7 +57,7 @@ function UsersPage() {
 				navs={[
 					{
 						name: "Create channel",
-						path: "/user/webhooks/add",
+						path: "/admin/channels/add",
 						icon: "FaPlus",
 					},
 				]}
@@ -76,14 +74,31 @@ function UsersPage() {
 							tooltip: "Edit",
 							icon: "FaEdit",
 							callback: async (id) => {
-                                navigate('/admin/users/edit', { state: { id } });
+                                navigate('/admin/channels/edit', { state: { id } });
                             },
 						},
 						{
 							tooltip: "Delete",
 							icon: "FaTrash",
 							callback: async (id) => {
-								
+								try {
+									const req = await fetch(
+										"http://localhost:8080/api/channel/delete/"+id,
+										{
+											method: "DELETE",
+											headers: {
+												"Content-Type": "application/json",
+												auth: user.token,
+											},
+										}
+									);
+
+									if (req.status === 200) {
+										setChannels(channels.filter((channel) => channel[0] !== id));
+									}
+								} catch (e) {
+									console.log(e);
+								}
 							},
 						},
 					]}

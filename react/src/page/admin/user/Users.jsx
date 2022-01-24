@@ -59,7 +59,7 @@ function UsersPage() {
 				navs={[
 					{
 						name: "Create user",
-						path: "/user/webhooks/add",
+						path: "/admin/users/create",
 						icon: "FaPlus",
 					},
 				]}

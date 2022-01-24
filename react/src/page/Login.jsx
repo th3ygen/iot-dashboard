@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight, FaLock, FaUser } from "react-icons/fa";
 import styles from "styles/Login.module.scss";
 
+import * as alertify from "alertifyjs";
+
 function Login(props) {
 	const navigate = useNavigate();
 
@@ -44,6 +46,8 @@ function Login(props) {
                     });
                 }
 			} else {
+				alertify.error("Invalid username or password");
+
 				console.log("login failed");
 
 				/* empty all input */
@@ -79,6 +83,7 @@ function Login(props) {
 										login();
 									}
 								}}
+								autoComplete="new-password"
 								ref={passwordRef}
 							/>
 						</div>

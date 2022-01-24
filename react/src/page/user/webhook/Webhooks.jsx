@@ -39,7 +39,7 @@ function WebhooksPage() {
 								webhook.label,
 								webhook.trigger,
 								webhook.lastStatus || "",
-								webhook.lastRequestMessage || "",
+								// webhook.lastRequestMessage || "",
 								`${
 									webhook.active ? "Active" : "Inactive"
 								}:#FFF`,
@@ -73,10 +73,9 @@ function WebhooksPage() {
 						"Label",
 						"Trigger",
 						"Req. status",
-						"Req. message",
 						"Status",
 					]}
-					colWidthPercent={["20%", "10%", "10%", "20%", "10%"]}
+					colWidthPercent={["20%", "10%", "10%", "10%"]}
 					centered={[false, false, true, false, false]}
 					items={webhooks}
 					actions={[
@@ -166,7 +165,7 @@ function WebhooksPage() {
 													webhook.label,
 													webhook.trigger,
 													webhook.lastStatus || "",
-													webhook.lastRequestMessage || "",
+													// webhook.lastRequestMessage || "",
 													`${
 														webhook.active
 															? "Active"

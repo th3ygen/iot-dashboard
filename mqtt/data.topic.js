@@ -18,14 +18,14 @@ module.exports = {
 			}
 
 			// check window
-			/* const isWindowOpen = await channel.isWindowOpen();
+			const isWindowOpen = await channel.isWindowOpen();
 			if (!isWindowOpen) {
 				console.log(
 					"window is closed, time left is",
 					channel.nextWindowTime - Date.now()
 				);
 				return;
-			} */
+			}
 
 			if (channel.keys.w) {
 				if (!data.key) {

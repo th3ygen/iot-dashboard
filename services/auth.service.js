@@ -133,6 +133,100 @@ const register = (username, password, email, title) => (
     })
 );
 
+const create = (username, password, email, title, role) => (
+    new Promise(async (resolve, reject) => {    
+        try {
+            let user = await User.findOne({ username });
+
+            if (user) {
+                return reject({
+                    label: `create from {u:${username}, p:${password}, e:${email}}`,
+                    msg: 'username already exists',
+                    payload: {
+                        username,
+                        email,
+                        password,
+                    },
+                });
+            }
+
+            const hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALTROUNDS));
+
+            user = new User({
+                username, hash, email, title, role,
+            });
+
+            await user.save();
+
+            resolve(user);
+        } catch (e) {
+            reject({
+                label: 'create',
+                payload: {
+                    username, password, email
+                },
+                msg: e.message
+            });
+        }
+    })
+);
+
+const update = (id, username, password, email, title, role) => (
+    new Promise(async (resolve, reject) => {
+        try {
+            let user = await User.findById(id);
+
+            if (!user) {
+                return reject({
+                    label: `update from {id:${id}, u:${username}, p:${password}, e:${email}}`,
+                    msg: 'user not found',
+                    payload: {
+                        id,
+                        username,
+                        email,
+                        password,
+                    },
+                });
+
+            }
+
+            if (username) {
+                user.username = username;
+            }
+
+            if (password && password.length > 0) {
+                user.hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALTROUNDS));
+            }
+
+            if (email) {
+                user.email = email;
+            }
+
+            if (title) {
+                user.title = title;
+            }
+
+            if (role) {
+                user.role = role;
+            }
+
+            await user.save();
+
+            resolve(user);
+
+        } catch (e) {
+            reject({
+                label: 'update',
+                payload: {
+                    id, username, password, email
+                },
+                msg: e.message
+            });
+        }
+    })
+);
+
+
 const getRole = (id) => (
     new Promise(async (resolve, reject) => {
         try {
@@ -180,6 +274,28 @@ const deleteUser = (id) => (
     })
 );
 
+const get = (id) => (
+    new Promise(async (resolve, reject) => {
+        try {
+            const user = await User.findById(id);
+
+            if (!user) {
+                return reject({
+                    label: 'get',
+                    msg: 'user not found'
+                });
+            }
+
+            resolve(user);
+        } catch (e) {
+            reject({
+                label: 'get',
+                msg: e.message
+            });
+        }
+    })
+);
+
 const getAll = () => (
     new Promise(async (resolve, reject) => {
         try {
@@ -196,5 +312,5 @@ const getAll = () => (
 );
 
 module.exports = {
-    login, register, getRole, deleteUser, getAll
+    login, register, getRole, deleteUser, getAll, create, get, update
 };
